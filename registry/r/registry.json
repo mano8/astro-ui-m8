@@ -38,6 +38,42 @@
       "type": "registry:component",
       "title": "Data Table Server Faceted Filter",
       "description": "Single or multi-select faceted filter used by the canonical M8 data table."
+    },
+    {
+      "name": "state-loading",
+      "type": "registry:component",
+      "title": "State Loading",
+      "description": "Canonical loading state for M8 table and page surfaces."
+    },
+    {
+      "name": "state-empty",
+      "type": "registry:component",
+      "title": "State Empty",
+      "description": "Canonical empty state for M8 table and page surfaces."
+    },
+    {
+      "name": "state-error",
+      "type": "registry:component",
+      "title": "State Error",
+      "description": "Canonical error state with optional retry action."
+    },
+    {
+      "name": "state-unauthorized",
+      "type": "registry:component",
+      "title": "State Unauthorized",
+      "description": "Canonical unauthorized state for auth-gated plugin pages."
+    },
+    {
+      "name": "dialog-form",
+      "type": "registry:component",
+      "title": "Dialog Form Recipe",
+      "description": "Shared Dialog create/edit form and AlertDialog destructive-confirm recipe using react-hook-form and zodResolver."
+    },
+    {
+      "name": "table-page",
+      "type": "registry:component",
+      "title": "Table Page Recipe",
+      "description": "Shared table page shell that wires title, actions, canonical states, and the controlled data table."
     }
   ]
 }
