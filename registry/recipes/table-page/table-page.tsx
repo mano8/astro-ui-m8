@@ -6,11 +6,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 import {
   DataTableServer,
   type DataTableServerProps,
-} from "./data-table";
-import { StateEmpty } from "./state-empty";
-import { StateError } from "./state-error";
-import { StateLoading } from "./state-loading";
-import { StateUnauthorized } from "./state-unauthorized";
+} from "../../blocks/data-table/data-table";
+import { StateEmpty } from "../../blocks/state/state-empty";
+import { StateError } from "../../blocks/state/state-error";
+import { StateLoading } from "../../blocks/state/state-loading";
+import { StateUnauthorized } from "../../blocks/state/state-unauthorized";
 
 export type TablePageStatus = "ready" | "loading" | "empty" | "error" | "unauthorized";
 

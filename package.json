@@ -45,6 +45,8 @@
   "scripts": {
     "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.build.json && npm run build:registry",
     "build:registry": "node scripts/build-registry.mjs",
+    "preview:build": "vite build --config fixtures/preview/vite.config.ts",
+    "preview:dev": "vite --config fixtures/preview/vite.config.ts",
     "test": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "vitest run",
