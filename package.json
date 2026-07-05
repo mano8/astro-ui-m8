@@ -21,6 +21,7 @@
   ],
   "files": [
     "dist",
+    "src/lib/tokens.css",
     "registry.json",
     "registry/r",
     "registry/blocks",
@@ -37,11 +38,12 @@
     "./testing": {
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
-    }
+    },
+    "./src/lib/tokens.css": "./src/lib/tokens.css"
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json && npm run build:registry",
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.build.json && npm run build:registry",
     "build:registry": "node scripts/build-registry.mjs",
     "test": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit",
