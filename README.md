@@ -26,6 +26,37 @@ devDependencies) and declare their `registryDependencies` on its registry items.
 Prerequisite runtime packages for copied blocks are declared as
 `peerDependencies` and documented in `registry/README.md`.
 
+## Frozen Phase 1 contract
+
+Phase 1 Step 2 freezes the shared naming and host import assumptions before any
+consumer depends on the generated registry output.
+
+Frozen registry item names:
+
+- `data-table`
+- `data-table-column-header`
+- `data-table-pagination`
+- `data-table-view-options`
+- `data-table-server-toolbar`
+- `data-table-server-faceted-filter`
+- `state-loading`
+- `state-empty`
+- `state-error`
+- `state-unauthorized`
+- `dialog-form`
+- `table-page`
+
+Host alias/import contract for copied registry blocks:
+
+- shadcn primitives resolve from `@/components/ui/*`
+- utility helpers resolve from `@/lib/utils`
+- hosts import the canonical token bridge from
+  `@mano8/astro-ui-m8/src/lib/tokens.css`
+
+These names are frozen once consumers start depending on them. Breaking changes
+to registry item names, copied-file structure, or required host aliases are
+minor-version changes during `0.x`.
+
 ## Commands
 
 - `npm run build` — `tsc` → `dist/`, then `build:registry`.

@@ -114,6 +114,29 @@
   "uiCompatibility": {
     "astroUiM8": "^0.1.0-alpha.1"
   },
+  "mano8RegistryContract": {
+    "version": 1,
+    "registryNamespace": "@mano8-ui",
+    "frozenItemNames": [
+      "data-table",
+      "data-table-column-header",
+      "data-table-pagination",
+      "data-table-view-options",
+      "data-table-server-toolbar",
+      "data-table-server-faceted-filter",
+      "state-loading",
+      "state-empty",
+      "state-error",
+      "state-unauthorized",
+      "dialog-form",
+      "table-page"
+    ],
+    "consumerImports": {
+      "ui": "@/components/ui/*",
+      "utils": "@/lib/utils",
+      "tokensCss": "@mano8/astro-ui-m8/src/lib/tokens.css"
+    }
+  },
   "allowScripts": {
     "esbuild@0.28.1": true
   }
