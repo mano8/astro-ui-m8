@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "data-table-view-options",
+  "type": "registry:component",
+  "title": "Data Table View Options",
+  "description": "Column visibility menu used by the canonical M8 data table.",
+  "dependencies": [
+    "@tanstack/react-table",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button",
+    "dropdown-menu"
+  ],
+  "files": [
+    {
+      "path": "registry/blocks/data-table/data-table-view-options.tsx",
+      "content": "\"use client\";\n\nimport type { Table } from \"@tanstack/react-table\";\nimport { Settings2 } from \"lucide-react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport {\n  DropdownMenu,\n  DropdownMenuCheckboxItem,\n  DropdownMenuContent,\n  DropdownMenuLabel,\n  DropdownMenuSeparator,\n  DropdownMenuTrigger,\n} from \"@/components/ui/dropdown-menu\";\n\nexport interface DataTableViewOptionsLabels {\n  view: string;\n  toggleColumns: string;\n}\n\nconst DEFAULT_LABELS: DataTableViewOptionsLabels = {\n  view: \"View\",\n  toggleColumns: \"Toggle columns\",\n};\n\ninterface DataTableViewOptionsProps<TData> {\n  table: Table<TData>;\n  labels?: Partial<DataTableViewOptionsLabels>;\n}\n\nexport function DataTableViewOptions<TData>({\n  table,\n  labels,\n}: DataTableViewOptionsProps<TData>) {\n  const t = { ...DEFAULT_LABELS, ...labels };\n  return (\n    <DropdownMenu>\n      <DropdownMenuTrigger asChild>\n        <Button variant=\"outline\" size=\"sm\" className=\"ml-auto h-8\">\n          <Settings2 className=\"mr-2 size-4\" />\n          {t.view}\n        </Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent align=\"end\" className=\"w-[170px]\">\n        <DropdownMenuLabel>{t.toggleColumns}</DropdownMenuLabel>\n        <DropdownMenuSeparator />\n        {table\n          .getAllColumns()\n          .filter((column) => typeof column.accessorFn !== \"undefined\" && column.getCanHide())\n          .map((column) => (\n            <DropdownMenuCheckboxItem\n              key={column.id}\n              className=\"capitalize\"\n              checked={column.getIsVisible()}\n              onCheckedChange={(value) => column.toggleVisibility(Boolean(value))}\n            >\n              {column.id}\n            </DropdownMenuCheckboxItem>\n          ))}\n      </DropdownMenuContent>\n    </DropdownMenu>\n  );\n}\n",
+      "type": "registry:component",
+      "target": "components/m8-ui/data-table-view-options.tsx"
+    }
+  ]
+}

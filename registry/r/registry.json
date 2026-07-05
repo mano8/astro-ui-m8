@@ -2,5 +2,42 @@
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "mano8-ui",
   "homepage": "https://github.com/mano8/astro-ui-m8",
-  "items": []
+  "items": [
+    {
+      "name": "data-table",
+      "type": "registry:component",
+      "title": "Data Table",
+      "description": "Canonical controlled shadcn data table for the M8 Astro plugin fleet: search, faceted filters, sorting, pagination, row selection, and column visibility on @tanstack/react-table."
+    },
+    {
+      "name": "data-table-column-header",
+      "type": "registry:component",
+      "title": "Data Table Column Header",
+      "description": "Sortable, hideable column header used by the canonical M8 data table."
+    },
+    {
+      "name": "data-table-pagination",
+      "type": "registry:component",
+      "title": "Data Table Pagination",
+      "description": "Pagination controls used by the canonical M8 data table."
+    },
+    {
+      "name": "data-table-view-options",
+      "type": "registry:component",
+      "title": "Data Table View Options",
+      "description": "Column visibility menu used by the canonical M8 data table."
+    },
+    {
+      "name": "data-table-server-toolbar",
+      "type": "registry:component",
+      "title": "Data Table Server Toolbar",
+      "description": "Search, reset, faceted-filter, view-options, and action toolbar for the canonical M8 data table."
+    },
+    {
+      "name": "data-table-server-faceted-filter",
+      "type": "registry:component",
+      "title": "Data Table Server Faceted Filter",
+      "description": "Single or multi-select faceted filter used by the canonical M8 data table."
+    }
+  ]
 }
