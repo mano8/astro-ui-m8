@@ -1,0 +1,120 @@
+{
+  "name": "@mano8/astro-ui-m8",
+  "version": "0.1.0-alpha.1",
+  "description": "Canonical shared shadcn UI registry, design-token bridge, generic list-params, and test harness for the M8 astro-*-m8 plugin fleet.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mano8/astro-ui-m8.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "shadcn",
+    "shadcn-registry",
+    "data-table",
+    "ui",
+    "astro",
+    "m8"
+  ],
+  "files": [
+    "dist",
+    "registry.json",
+    "registry/r",
+    "registry/blocks",
+    "registry/recipes",
+    "registry/README.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./testing": {
+      "types": "./dist/src/testing/index.d.ts",
+      "default": "./dist/src/testing/index.js"
+    }
+  },
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && npm run build:registry",
+    "build:registry": "node scripts/build-registry.mjs",
+    "test": "vitest run --coverage",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:unit": "vitest run"
+  },
+  "peerDependencies": {
+    "@hookform/resolvers": "^3.0.0 || ^4.0.0 || ^5.0.0",
+    "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-table": "^8.20.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "cmdk": "^1.0.0",
+    "lucide-react": "^0.400.0 || ^0.500.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-hook-form": "^7.50.0",
+    "tailwind-merge": "^2.0.0 || ^3.0.0",
+    "zod": "^4.0.0",
+    "@radix-ui/react-alert-dialog": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.0",
+    "@radix-ui/react-dialog": "^1.1.0",
+    "@radix-ui/react-dropdown-menu": "^2.1.0",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.0",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@hookform/resolvers": { "optional": true },
+    "@tanstack/react-query": { "optional": true },
+    "@tanstack/react-table": { "optional": true },
+    "class-variance-authority": { "optional": true },
+    "clsx": { "optional": true },
+    "cmdk": { "optional": true },
+    "lucide-react": { "optional": true },
+    "react": { "optional": true },
+    "react-dom": { "optional": true },
+    "react-hook-form": { "optional": true },
+    "tailwind-merge": { "optional": true },
+    "zod": { "optional": true },
+    "@radix-ui/react-alert-dialog": { "optional": true },
+    "@radix-ui/react-checkbox": { "optional": true },
+    "@radix-ui/react-dialog": { "optional": true },
+    "@radix-ui/react-dropdown-menu": { "optional": true },
+    "@radix-ui/react-label": { "optional": true },
+    "@radix-ui/react-popover": { "optional": true },
+    "@radix-ui/react-select": { "optional": true },
+    "@radix-ui/react-separator": { "optional": true },
+    "@radix-ui/react-slot": { "optional": true }
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-table": "^8.20.0",
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^4.1.9",
+    "jsdom": "^29.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.9",
+    "zod": "^4.0.0"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
+  },
+  "uiCompatibility": {
+    "astroUiM8": "^0.1.0-alpha.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}
