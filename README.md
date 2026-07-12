@@ -26,6 +26,37 @@ devDependencies) and declare their `registryDependencies` on its registry items.
 Prerequisite runtime packages for copied blocks are declared as
 `peerDependencies` and documented in `registry/README.md`.
 
+## Frozen Phase 1 contract
+
+Phase 1 Step 2 freezes the shared naming and host import assumptions before any
+consumer depends on the generated registry output.
+
+Frozen registry item names:
+
+- `data-table`
+- `data-table-column-header`
+- `data-table-pagination`
+- `data-table-view-options`
+- `data-table-server-toolbar`
+- `data-table-server-faceted-filter`
+- `state-loading`
+- `state-empty`
+- `state-error`
+- `state-unauthorized`
+- `dialog-form`
+- `table-page`
+
+Host alias/import contract for copied registry blocks:
+
+- shadcn primitives resolve from `@/components/ui/*`
+- utility helpers resolve from `@/lib/utils`
+- hosts import the canonical token bridge from
+  `@mano8/astro-ui-m8/src/lib/tokens.css`
+
+These names are frozen. As of `1.0.0` the package follows strict semver:
+breaking changes to registry item names, copied-file structure, or required host
+aliases are **major**-version changes.
+
 ## Commands
 
 - `npm run build` — `tsc` → `dist/`, then `build:registry`.
@@ -34,5 +65,5 @@ Prerequisite runtime packages for copied blocks are declared as
 - `npm test` — Vitest with coverage.
 - `npm run test:unit` — Vitest without coverage.
 
-> Status: scaffolding in progress (Phase 1). Registry blocks, recipes, token
-> bridge, list-params, and the test harness are being added incrementally.
+> Status: stable (`1.0.0`). Registry blocks, recipes, token bridge, list-params,
+> and the test harness are in place and follow strict semver.

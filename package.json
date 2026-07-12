@@ -1,6 +1,6 @@
 {
   "name": "@mano8/astro-ui-m8",
-  "version": "0.1.0-alpha.1",
+  "version": "1.0.0",
   "description": "Canonical shared shadcn UI registry, design-token bridge, generic list-params, and test harness for the M8 astro-*-m8 plugin fleet.",
   "type": "module",
   "license": "MIT",
@@ -21,6 +21,7 @@
   ],
   "files": [
     "dist",
+    "src/lib/tokens.css",
     "registry.json",
     "registry/r",
     "registry/blocks",
@@ -37,15 +38,20 @@
     "./testing": {
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
-    }
+    },
+    "./src/lib/tokens.css": "./src/lib/tokens.css"
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json && npm run build:registry",
+    "build": "node scripts/clean-dist.mjs && tsc -p tsconfig.build.json && npm run build:registry",
     "build:registry": "node scripts/build-registry.mjs",
+    "preview:build": "vite build --config fixtures/preview/vite.config.ts",
+    "preview:dev": "vite --config fixtures/preview/vite.config.ts",
     "test": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "verify:registry-consumer": "node scripts/verify-registry-consumer.mjs",
+    "verify:tarball-install": "node scripts/verify-tarball-install.mjs"
   },
   "peerDependencies": {
     "@hookform/resolvers": "^3.0.0 || ^4.0.0 || ^5.0.0",
@@ -112,7 +118,30 @@
     "esbuild": "^0.28.1"
   },
   "uiCompatibility": {
-    "astroUiM8": "^0.1.0-alpha.1"
+    "astroUiM8": "^1.0.0"
+  },
+  "mano8RegistryContract": {
+    "version": 1,
+    "registryNamespace": "@mano8-ui",
+    "frozenItemNames": [
+      "data-table",
+      "data-table-column-header",
+      "data-table-pagination",
+      "data-table-view-options",
+      "data-table-server-toolbar",
+      "data-table-server-faceted-filter",
+      "state-loading",
+      "state-empty",
+      "state-error",
+      "state-unauthorized",
+      "dialog-form",
+      "table-page"
+    ],
+    "consumerImports": {
+      "ui": "@/components/ui/*",
+      "utils": "@/lib/utils",
+      "tokensCss": "@mano8/astro-ui-m8/src/lib/tokens.css"
+    }
   },
   "allowScripts": {
     "esbuild@0.28.1": true
