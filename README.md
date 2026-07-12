@@ -53,9 +53,9 @@ Host alias/import contract for copied registry blocks:
 - hosts import the canonical token bridge from
   `@mano8/astro-ui-m8/src/lib/tokens.css`
 
-These names are frozen once consumers start depending on them. Breaking changes
-to registry item names, copied-file structure, or required host aliases are
-minor-version changes during `0.x`.
+These names are frozen. As of `1.0.0` the package follows strict semver:
+breaking changes to registry item names, copied-file structure, or required host
+aliases are **major**-version changes.
 
 ## Commands
 
@@ -65,5 +65,5 @@ minor-version changes during `0.x`.
 - `npm test` — Vitest with coverage.
 - `npm run test:unit` — Vitest without coverage.
 
-> Status: scaffolding in progress (Phase 1). Registry blocks, recipes, token
-> bridge, list-params, and the test harness are being added incrementally.
+> Status: stable (`1.0.0`). Registry blocks, recipes, token bridge, list-params,
+> and the test harness are in place and follow strict semver.
