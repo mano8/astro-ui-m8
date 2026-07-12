@@ -39,6 +39,7 @@ Frozen registry item names:
 - `data-table-view-options`
 - `data-table-server-toolbar`
 - `data-table-server-faceted-filter`
+- `toast-notification`
 - `state-loading`
 - `state-empty`
 - `state-error`

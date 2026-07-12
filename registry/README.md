@@ -15,7 +15,7 @@ runtime-import these copied UI blocks from this package.
 - Treat generated item names as frozen during adoption:
   `data-table`, `data-table-column-header`, `data-table-pagination`,
   `data-table-view-options`, `data-table-server-toolbar`,
-  `data-table-server-faceted-filter`, `state-loading`, `state-empty`,
+  `data-table-server-faceted-filter`, `toast-notification`, `state-loading`, `state-empty`,
   `state-error`, `state-unauthorized`, `dialog-form`, `table-page`.
 
 ## Required Packages
@@ -28,6 +28,13 @@ Copied blocks expect these runtime packages in the host app:
 - `react-hook-form`, `@hookform/resolvers`, `zod`
 - `lucide-react`
 - `class-variance-authority`, `clsx`, `tailwind-merge`
+- `sonner`
+
+## Toast notifications
+
+Install `toast-notification`, mount `ToastNotificationHost` once in the
+interactive shell, and use `toastNotification.success`, `.error`, or `.info`
+from mutation callbacks. The item composes the shadcn Sonner primitive.
 - `@radix-ui/react-alert-dialog`
 - `@radix-ui/react-checkbox`
 - `@radix-ui/react-dialog`

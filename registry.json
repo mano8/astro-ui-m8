@@ -153,6 +153,21 @@
       ]
     },
     {
+      "name": "toast-notification",
+      "type": "registry:component",
+      "title": "Toast Notification",
+      "description": "Canonical shadcn Sonner toast host and success, error, and info helpers for M8 plugin surfaces.",
+      "dependencies": ["sonner"],
+      "registryDependencies": ["sonner"],
+      "files": [
+        {
+          "path": "registry/blocks/feedback/toast-notification.tsx",
+          "type": "registry:component",
+          "target": "components/m8-ui/toast-notification.tsx"
+        }
+      ]
+    },
+    {
       "name": "state-loading",
       "type": "registry:component",
       "title": "State Loading",

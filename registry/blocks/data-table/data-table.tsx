@@ -76,6 +76,8 @@ export interface DataTableServerProps<TData, TValue, TFilter extends string = st
   filterOptions?: DataTableFilterOptions;
   pageSizeOptions?: number[];
   labels?: Partial<DataTableServerLabels>;
+  getRowId?: (row: TData) => string;
+  rowAttributes?: (row: TData) => React.HTMLAttributes<HTMLTableRowElement>;
 }
 
 export function DataTableServer<TData, TValue, TFilter extends string = string>({
@@ -99,6 +101,8 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
   filterOptions,
   pageSizeOptions,
   labels,
+  getRowId,
+  rowAttributes,
 }: DataTableServerProps<TData, TValue, TFilter>) {
   const t = { ...DEFAULT_LABELS, ...labels };
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
@@ -133,6 +137,7 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
     getSortedRowModel: getSortedRowModel(),
     autoResetPageIndex: false,
     autoResetExpanded: false,
+    getRowId,
     onPaginationChange: (updater) => {
       const next = typeof updater === "function" ? updater(paginationState) : updater;
       if (next.pageIndex !== paginationState.pageIndex) {
@@ -193,7 +198,11 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
               </TableRow>
             ) : table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  {...rowAttributes?.(row.original)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
