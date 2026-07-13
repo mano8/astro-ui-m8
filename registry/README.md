@@ -15,7 +15,7 @@ runtime-import these copied UI blocks from this package.
 - Treat generated item names as frozen during adoption:
   `data-table`, `data-table-column-header`, `data-table-pagination`,
   `data-table-view-options`, `data-table-server-toolbar`,
-  `data-table-server-faceted-filter`, `state-loading`, `state-empty`,
+  `data-table-server-faceted-filter`, `toast-notification`, `state-loading`, `state-empty`,
   `state-error`, `state-unauthorized`, `dialog-form`, `table-page`.
 
 ## Required Packages
@@ -28,6 +28,13 @@ Copied blocks expect these runtime packages in the host app:
 - `react-hook-form`, `@hookform/resolvers`, `zod`
 - `lucide-react`
 - `class-variance-authority`, `clsx`, `tailwind-merge`
+- `sonner`
+
+## Toast notifications
+
+Install `toast-notification`, mount `ToastNotificationHost` once in the
+interactive shell, and use `toastNotification.success`, `.error`, or `.info`
+from mutation callbacks. The item composes the shadcn Sonner primitive.
 - `@radix-ui/react-alert-dialog`
 - `@radix-ui/react-checkbox`
 - `@radix-ui/react-dialog`
@@ -76,6 +83,11 @@ Main props on `DataTableServer<TData, TValue, TFilter>`:
 - optional query controls: `q`, `onSearchChange`, `f`, `onFilterChange`,
   `filterOptions`
 - optional UI controls: `addButton`, `visibility`, `pageSizeOptions`, `labels`
+- optional controlled row selection: `rowSelection`, `onRowSelectionChange`
+- `createDataTableSelectionColumn(labels)` for the first-column visible-row
+  select-all checkbox and accessible row checkboxes
+- optional `selectionActions`, rendered above and below the table with vertical
+  padding (consumers provide localized action content and selected-row count)
 - optional loading state: `loading`
 
 Behavior:
@@ -83,6 +95,8 @@ Behavior:
 - controlled pagination with 1-based `page`
 - manual sorting and filtering when callbacks are provided
 - duplicated top/bottom pagination
+- select-all applies only to the rows visible on the current page
+- duplicated top/bottom selection actions when `selectionActions` is provided
 - loading and empty labels overrideable through `labels`
 
 Use `src/lib/list-params.ts` when a backend speaks `skip`/`limit` and the UI

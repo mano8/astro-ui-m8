@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toast-notification",
+  "type": "registry:component",
+  "title": "Toast Notification",
+  "description": "Canonical shadcn Sonner toast host and success, error, and info helpers for M8 plugin surfaces.",
+  "dependencies": [
+    "sonner"
+  ],
+  "registryDependencies": [
+    "sonner"
+  ],
+  "files": [
+    {
+      "path": "registry/blocks/feedback/toast-notification.tsx",
+      "content": "\"use client\";\n\nimport { Toaster as SonnerToaster, toast } from \"sonner\";\n\nexport type ToastNotification = {\n  title: string;\n  description?: string;\n};\n\nexport function ToastNotificationHost() {\n  return <SonnerToaster closeButton richColors position=\"top-right\" />;\n}\n\nexport const toastNotification = {\n  success(message: ToastNotification) {\n    toast.success(message.title, { description: message.description });\n  },\n  error(message: ToastNotification) {\n    toast.error(message.title, { description: message.description });\n  },\n  info(message: ToastNotification) {\n    toast.info(message.title, { description: message.description });\n  },\n} as const;\n",
+      "type": "registry:component",
+      "target": "components/m8-ui/toast-notification.tsx"
+    }
+  ]
+}

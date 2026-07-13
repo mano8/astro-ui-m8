@@ -12,7 +12,8 @@
       "@/*": ["./*"],
       "lucide-react": ["./types/lucide-react.tsx"],
       "react-hook-form": ["./types/react-hook-form.tsx"],
-      "@hookform/resolvers/zod": ["./types/hookform-resolvers-zod.ts"]
+      "@hookform/resolvers/zod": ["./types/hookform-resolvers-zod.ts"],
+      "sonner": ["./types/sonner.tsx"]
     }
   },
   "include": [

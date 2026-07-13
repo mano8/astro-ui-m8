@@ -1,5 +1,7 @@
 # @mano8/astro-ui-m8
 
+![CI/CD](https://github.com/mano8/astro-ui-m8/actions/workflows/CI.yaml/badge.svg?branch=main)
+
 Canonical shared UI foundation for the M8 `astro-*-m8` plugin fleet. It is **not**
 a business plugin and **not** an Astro integration — it registers no routes,
 injects no integration, and fronts no backend service.
@@ -39,6 +41,7 @@ Frozen registry item names:
 - `data-table-view-options`
 - `data-table-server-toolbar`
 - `data-table-server-faceted-filter`
+- `toast-notification`
 - `state-loading`
 - `state-empty`
 - `state-error`
