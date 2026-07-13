@@ -1,6 +1,6 @@
 {
   "name": "@mano8/astro-ui-m8",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Canonical shared shadcn UI registry, design-token bridge, generic list-params, and test harness for the M8 astro-*-m8 plugin fleet.",
   "type": "module",
   "license": "MIT",
