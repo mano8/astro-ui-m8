@@ -19,6 +19,11 @@ describe("shared registry contract", () => {
     expect(registry.items.some((item) => item.name === "toast-notification")).toBe(true);
     expect(table).toContain("rowAttributes");
     expect(table).toContain("getRowId");
+    expect(table).toContain("createDataTableSelectionColumn");
+    expect(table).toContain("toggleAllPageRowsSelected");
+    expect(table).toContain("data-data-table-selection-actions");
+    expect(table).toContain('className="flex justify-end py-3"');
+    expect(table).toContain("onRowSelectionChange");
     expect(toast).toContain("toast.success");
     expect(toast).toContain("ToastNotificationHost");
   });

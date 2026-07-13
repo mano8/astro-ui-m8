@@ -83,6 +83,11 @@ Main props on `DataTableServer<TData, TValue, TFilter>`:
 - optional query controls: `q`, `onSearchChange`, `f`, `onFilterChange`,
   `filterOptions`
 - optional UI controls: `addButton`, `visibility`, `pageSizeOptions`, `labels`
+- optional controlled row selection: `rowSelection`, `onRowSelectionChange`
+- `createDataTableSelectionColumn(labels)` for the first-column visible-row
+  select-all checkbox and accessible row checkboxes
+- optional `selectionActions`, rendered above and below the table with vertical
+  padding (consumers provide localized action content and selected-row count)
 - optional loading state: `loading`
 
 Behavior:
@@ -90,6 +95,8 @@ Behavior:
 - controlled pagination with 1-based `page`
 - manual sorting and filtering when callbacks are provided
 - duplicated top/bottom pagination
+- select-all applies only to the rows visible on the current page
+- duplicated top/bottom selection actions when `selectionActions` is provided
 - loading and empty labels overrideable through `labels`
 
 Use `src/lib/list-params.ts` when a backend speaks `skip`/`limit` and the UI

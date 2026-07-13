@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   type ColumnDef,
+  type OnChangeFn,
   type RowSelectionState,
   type SortingState,
   type VisibilityState,
@@ -12,6 +13,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -32,6 +34,43 @@ import {
 } from "./data-table-server-toolbar";
 
 export type DataTableSortDirection = "asc" | "desc";
+
+export interface DataTableSelectionLabels<TData> {
+  selectAllVisible: string;
+  selectRow: (row: TData) => string;
+}
+
+export function createDataTableSelectionColumn<TData>(
+  labels: DataTableSelectionLabels<TData>,
+): ColumnDef<TData, unknown> {
+  return {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        aria-label={labels.selectAllVisible}
+        checked={
+          table.getIsAllPageRowsSelected()
+            ? true
+            : table.getIsSomePageRowsSelected()
+              ? "indeterminate"
+              : false
+        }
+        data-data-table-select-all="visible"
+        onCheckedChange={(checked) => table.toggleAllPageRowsSelected(checked === true)}
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        aria-label={labels.selectRow(row.original)}
+        checked={row.getIsSelected()}
+        data-data-table-row-selection={row.id}
+        onCheckedChange={(checked) => row.toggleSelected(checked === true)}
+      />
+    ),
+    enableHiding: false,
+    enableSorting: false,
+  };
+}
 
 export interface DataTableFilter {
   columnId?: string;
@@ -78,6 +117,9 @@ export interface DataTableServerProps<TData, TValue, TFilter extends string = st
   labels?: Partial<DataTableServerLabels>;
   getRowId?: (row: TData) => string;
   rowAttributes?: (row: TData) => React.HTMLAttributes<HTMLTableRowElement>;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  selectionActions?: React.ReactNode;
 }
 
 export function DataTableServer<TData, TValue, TFilter extends string = string>({
@@ -103,9 +145,14 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
   labels,
   getRowId,
   rowAttributes,
+  rowSelection: controlledRowSelection,
+  onRowSelectionChange,
+  selectionActions,
 }: DataTableServerProps<TData, TValue, TFilter>) {
   const t = { ...DEFAULT_LABELS, ...labels };
-  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+  const [internalRowSelection, setInternalRowSelection] = React.useState<RowSelectionState>({});
+  const rowSelection = controlledRowSelection ?? internalRowSelection;
+  const updateRowSelection = onRowSelectionChange ?? setInternalRowSelection;
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(visibility);
 
@@ -154,8 +201,18 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
       onSortChange(first?.id, first ? (first.desc ? "desc" : "asc") : undefined);
     },
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: updateRowSelection,
   });
+
+  const renderSelectionActions = (position: "top" | "bottom") =>
+    selectionActions ? (
+      <div
+        className="flex justify-end py-3"
+        data-data-table-selection-actions={position}
+      >
+        {selectionActions}
+      </div>
+    ) : null;
 
   return (
     <div className="space-y-4">
@@ -174,6 +231,7 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
         labels={t.pagination}
         pageSizeOptions={pageSizeOptions}
       />
+      {renderSelectionActions("top")}
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
@@ -220,6 +278,7 @@ export function DataTableServer<TData, TValue, TFilter extends string = string>(
           </TableBody>
         </Table>
       </div>
+      {renderSelectionActions("bottom")}
       <DataTablePagination
         table={table}
         labels={t.pagination}
