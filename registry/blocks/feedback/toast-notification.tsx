@@ -7,8 +7,20 @@ export type ToastNotification = {
   description?: string;
 };
 
-export function ToastNotificationHost() {
-  return <SonnerToaster closeButton richColors position="top-right" />;
+export type ToastPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
+
+export function ToastNotificationHost({
+  position = "top-right",
+}: {
+  position?: ToastPosition;
+} = {}) {
+  return <SonnerToaster closeButton richColors position={position} />;
 }
 
 export const toastNotification = {
