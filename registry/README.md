@@ -35,6 +35,9 @@ Copied blocks expect these runtime packages in the host app:
 Install `toast-notification`, mount `ToastNotificationHost` once in the
 interactive shell, and use `toastNotification.success`, `.error`, or `.info`
 from mutation callbacks. The item composes the shadcn Sonner primitive.
+`ToastNotificationHost` accepts an optional `position` prop
+(default `"top-right"`); pass e.g. `position="bottom-right"` to move the
+toast stack.
 - `@radix-ui/react-alert-dialog`
 - `@radix-ui/react-checkbox`
 - `@radix-ui/react-dialog`
