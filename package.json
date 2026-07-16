@@ -103,7 +103,8 @@
     "@radix-ui/react-slot": { "optional": true }
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.64.0",
+    "@typescript-eslint/parser": "^8.64.0",
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-table": "^8.20.0",
     "@testing-library/dom": "^10.0.0",
@@ -112,16 +113,14 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitest/coverage-v8": "^4.1.9",
-    "eslint": "^10.7.0",
+    "eslint": "8.57.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-security": "^4.0.1",
-    "globals": "^17.7.0",
     "jsdom": "^29.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.64.0",
     "vitest": "^4.1.9",
     "zod": "^4.0.0"
   },
