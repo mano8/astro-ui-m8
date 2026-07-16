@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: "v8",
-      reporter: ["text", "json-summary"],
+      reporter: ["text", "json-summary", "lcov"],
       include: ["src/**/*.ts"],
       // The React test harness under src/testing is exercised by its own
       // self-tests (Phase 1) but is not line-gated here; strict 100% applies to

@@ -1,6 +1,8 @@
 # @mano8/astro-ui-m8
 
 ![CI/CD](https://github.com/mano8/astro-ui-m8/actions/workflows/CI.yaml/badge.svg?branch=main)
+[![codecov](https://codecov.io/github/mano8/astro-ui-m8/graph/badge.svg?token=XF91Y8PZJQ)](https://codecov.io/github/mano8/astro-ui-m8)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/afd9d56b75d84a09a1f6b5c978e7eed9)](https://app.codacy.com/gh/mano8/astro-ui-m8/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 Canonical shared UI foundation for the M8 `astro-*-m8` plugin fleet. It is **not**
 a business plugin and **not** an Astro integration — it registers no routes,
