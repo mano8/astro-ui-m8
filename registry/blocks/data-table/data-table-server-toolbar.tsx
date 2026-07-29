@@ -55,6 +55,20 @@ interface DataTableSearchControlsProps {
   resetLabel: string;
 }
 
+interface DataTableSearchResetProps {
+  label: string;
+  onReset: () => void;
+}
+
+function DataTableSearchReset({ label, onReset }: DataTableSearchResetProps) {
+  return (
+    <Button variant="ghost" onClick={onReset} className="h-8 px-2 lg:px-3">
+      {label}
+      <X className="ml-2 size-4" />
+    </Button>
+  );
+}
+
 function DataTableSearchControls({
   initialQuery,
   onSearchChange,
@@ -81,17 +95,13 @@ function DataTableSearchControls({
         <Search className="ml-2 size-4" />
       </Button>
       {qSearch ? (
-        <Button
-          variant="ghost"
-          onClick={() => {
+        <DataTableSearchReset
+          label={resetLabel}
+          onReset={() => {
             setQSearch("");
             onSearchChange("");
           }}
-          className="h-8 px-2 lg:px-3"
-        >
-          {resetLabel}
-          <X className="ml-2 size-4" />
-        </Button>
+        />
       ) : null}
     </div>
   );
