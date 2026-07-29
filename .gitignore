@@ -143,7 +143,3 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
-
-# Claude
-CLAUDE.md
-.claude/
