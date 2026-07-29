@@ -21,20 +21,18 @@ export type ToastPosition =
 // light regardless of the active theme. Track `data-theme` and hand Sonner an
 // explicit theme so every toast — including the first — matches Starlight.
 function useStarlightTheme(): "light" | "dark" {
-  const [theme, setTheme] = React.useState<"light" | "dark">("light");
-  React.useEffect(() => {
-    const root = document.documentElement;
-    const read = () =>
-      setTheme(root.dataset.theme === "dark" ? "dark" : "light");
-    read();
-    const observer = new MutationObserver(read);
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
-    return () => observer.disconnect();
-  }, []);
-  return theme;
+  return React.useSyncExternalStore(
+    (onStoreChange) => {
+      const observer = new MutationObserver(onStoreChange);
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme"],
+      });
+      return () => observer.disconnect();
+    },
+    () => (document.documentElement.dataset.theme === "dark" ? "dark" : "light"),
+    () => "light",
+  );
 }
 
 export function ToastNotificationHost({
