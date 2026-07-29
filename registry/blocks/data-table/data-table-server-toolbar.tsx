@@ -48,6 +48,55 @@ interface DataTableServerToolbarProps<TData, TFilter extends string> {
   labels?: Partial<DataTableServerToolbarLabels>;
 }
 
+interface DataTableSearchControlsProps {
+  initialQuery: string;
+  onSearchChange: (query: string) => void;
+  searchLabel: string;
+  resetLabel: string;
+}
+
+function DataTableSearchControls({
+  initialQuery,
+  onSearchChange,
+  searchLabel,
+  resetLabel,
+}: DataTableSearchControlsProps) {
+  const [qSearch, setQSearch] = React.useState(initialQuery);
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Input
+        placeholder={searchLabel}
+        value={qSearch}
+        onChange={(event) => setQSearch(event.target.value)}
+        className="h-8 w-[150px] lg:w-[250px]"
+        aria-label={searchLabel}
+      />
+      <Button
+        variant="ghost"
+        className="h-8 px-2 lg:px-3"
+        onClick={() => onSearchChange(qSearch)}
+      >
+        {searchLabel}
+        <Search className="ml-2 size-4" />
+      </Button>
+      {qSearch ? (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            setQSearch("");
+            onSearchChange("");
+          }}
+          className="h-8 px-2 lg:px-3"
+        >
+          {resetLabel}
+          <X className="ml-2 size-4" />
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
 export function DataTableServerToolbar<TData, TFilter extends string>({
   table,
   addButton,
@@ -59,46 +108,18 @@ export function DataTableServerToolbar<TData, TFilter extends string>({
   labels,
 }: DataTableServerToolbarProps<TData, TFilter>) {
   const t = { ...DEFAULT_LABELS, ...labels };
-  const [qSearch, setQSearch] = React.useState(q ?? "");
-
-  React.useEffect(() => {
-    setQSearch(q ?? "");
-  }, [q]);
 
   return (
     <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-1 flex-wrap items-center gap-2">
         {onSearchChange ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <Input
-              placeholder={t.search}
-              value={qSearch}
-              onChange={(event) => setQSearch(event.target.value)}
-              className="h-8 w-[150px] lg:w-[250px]"
-              aria-label={t.search}
-            />
-            <Button
-              variant="ghost"
-              className="h-8 px-2 lg:px-3"
-              onClick={() => onSearchChange(qSearch)}
-            >
-              {t.search}
-              <Search className="ml-2 size-4" />
-            </Button>
-            {qSearch ? (
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setQSearch("");
-                  onSearchChange("");
-                }}
-                className="h-8 px-2 lg:px-3"
-              >
-                {t.reset}
-                <X className="ml-2 size-4" />
-              </Button>
-            ) : null}
-          </div>
+          <DataTableSearchControls
+            key={q ?? ""}
+            initialQuery={q ?? ""}
+            onSearchChange={onSearchChange}
+            searchLabel={t.search}
+            resetLabel={t.reset}
+          />
         ) : null}
         {onFilterChange && filterOptions ? (
           <DataTableServerFacetedFilter
