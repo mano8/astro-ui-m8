@@ -1,6 +1,6 @@
 {
   "name": "@mano8/astro-ui-m8",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Canonical shared shadcn UI registry, design-token bridge, generic list-params, and test harness for the M8 astro-*-m8 plugin fleet.",
   "type": "module",
   "license": "MIT",
@@ -79,28 +79,72 @@
     "@radix-ui/react-slot": "^1.1.0"
   },
   "peerDependenciesMeta": {
-    "@hookform/resolvers": { "optional": true },
-    "@tanstack/react-query": { "optional": true },
-    "@tanstack/react-table": { "optional": true },
-    "class-variance-authority": { "optional": true },
-    "clsx": { "optional": true },
-    "cmdk": { "optional": true },
-    "lucide-react": { "optional": true },
-    "react": { "optional": true },
-    "react-dom": { "optional": true },
-    "react-hook-form": { "optional": true },
-    "sonner": { "optional": true },
-    "tailwind-merge": { "optional": true },
-    "zod": { "optional": true },
-    "@radix-ui/react-alert-dialog": { "optional": true },
-    "@radix-ui/react-checkbox": { "optional": true },
-    "@radix-ui/react-dialog": { "optional": true },
-    "@radix-ui/react-dropdown-menu": { "optional": true },
-    "@radix-ui/react-label": { "optional": true },
-    "@radix-ui/react-popover": { "optional": true },
-    "@radix-ui/react-select": { "optional": true },
-    "@radix-ui/react-separator": { "optional": true },
-    "@radix-ui/react-slot": { "optional": true }
+    "@hookform/resolvers": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "@tanstack/react-table": {
+      "optional": true
+    },
+    "class-variance-authority": {
+      "optional": true
+    },
+    "clsx": {
+      "optional": true
+    },
+    "cmdk": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-hook-form": {
+      "optional": true
+    },
+    "sonner": {
+      "optional": true
+    },
+    "tailwind-merge": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    },
+    "@radix-ui/react-alert-dialog": {
+      "optional": true
+    },
+    "@radix-ui/react-checkbox": {
+      "optional": true
+    },
+    "@radix-ui/react-dialog": {
+      "optional": true
+    },
+    "@radix-ui/react-dropdown-menu": {
+      "optional": true
+    },
+    "@radix-ui/react-label": {
+      "optional": true
+    },
+    "@radix-ui/react-popover": {
+      "optional": true
+    },
+    "@radix-ui/react-select": {
+      "optional": true
+    },
+    "@radix-ui/react-separator": {
+      "optional": true
+    },
+    "@radix-ui/react-slot": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
