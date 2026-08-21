@@ -27,4 +27,27 @@ describe("shared registry contract", () => {
     expect(toast).toContain("toast.success");
     expect(toast).toContain("ToastNotificationHost");
   });
+
+  it("ships the tree-view item with its documented hooks and a11y contract", () => {
+    const registry = JSON.parse(
+      readFileSync(resolve("registry.json"), "utf8"),
+    ) as { items: { name: string }[] };
+    const tree = readFileSync(
+      resolve("registry/blocks/tree/tree-view.tsx"),
+      "utf8",
+    );
+
+    expect(registry.items.some((item) => item.name === "tree-view")).toBe(true);
+    expect(tree).toContain("onSelect");
+    expect(tree).toContain("nodeAttributes");
+    expect(tree).toContain("renderNode");
+    expect(tree).toContain("selectedId");
+    expect(tree).toContain("expandedIds");
+    expect(tree).toContain("onExpandedChange");
+    expect(tree).toContain('role="tree"');
+    expect(tree).toContain('role="treeitem"');
+    expect(tree).toContain("aria-level");
+    expect(tree).toContain("aria-selected");
+    expect(tree).toContain("aria-expanded");
+  });
 });
