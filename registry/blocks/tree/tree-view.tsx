@@ -47,118 +47,197 @@ export interface TreeViewProps {
   labels?: Partial<TreeViewLabels>;
   empty?: React.ReactNode;
   className?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
 }
 
-interface TreeViewBranchProps {
+/** One entry of the depth-first list of currently visible nodes. */
+interface TreeViewFlatNode {
+  node: TreeViewNode;
+  level: number;
+  parentId: string | null;
+  hasChildren: boolean;
+  expanded: boolean;
+}
+
+function flattenVisibleNodes(
+  nodes: TreeViewNode[],
+  expanded: ReadonlySet<string>,
+  level: number,
+  parentId: string | null,
+  out: TreeViewFlatNode[],
+): TreeViewFlatNode[] {
+  for (const node of nodes) {
+    const children = node.children ?? [];
+    const hasChildren = children.length > 0;
+    const isExpanded = hasChildren && expanded.has(node.id);
+    out.push({ node, level, parentId, hasChildren, expanded: isExpanded });
+    if (isExpanded) {
+      flattenVisibleNodes(children, expanded, level + 1, node.id, out);
+    }
+  }
+  return out;
+}
+
+interface TreeViewItemsProps {
   nodes: TreeViewNode[];
   level: number;
+  idPrefix: string;
   selectedId?: string | null;
+  activeId: string | null;
   expanded: ReadonlySet<string>;
   onToggle: (node: TreeViewNode) => void;
   onSelect?: (node: TreeViewNode) => void;
+  onItemKeyDown: (event: React.KeyboardEvent<HTMLLIElement>, node: TreeViewNode) => void;
+  onItemFocus: (event: React.FocusEvent<HTMLLIElement>, node: TreeViewNode) => void;
+  onItemPointerDown: (node: TreeViewNode) => void;
+  registerItem: (id: string, element: HTMLLIElement | null) => void;
   renderNode?: (context: TreeViewNodeContext) => React.ReactNode;
   nodeAttributes?: (node: TreeViewNode) => React.LiHTMLAttributes<HTMLLIElement>;
   labels: TreeViewLabels;
 }
 
-function TreeViewBranch({
+function TreeViewItems({
   nodes,
   level,
+  idPrefix,
   selectedId,
+  activeId,
   expanded,
   onToggle,
   onSelect,
+  onItemKeyDown,
+  onItemFocus,
+  onItemPointerDown,
+  registerItem,
   renderNode,
   nodeAttributes,
   labels,
-}: TreeViewBranchProps) {
-  return (
-    <ul className={cn("flex flex-col gap-0.5", level > 1 && "ml-3 border-l pl-2")}>
-      {nodes.map((node) => {
-        const children = node.children ?? [];
-        const hasChildren = children.length > 0;
-        const isExpanded = hasChildren && expanded.has(node.id);
-        const isSelected = selectedId === node.id;
-        const toggle = () => onToggle(node);
-        const select = () => onSelect?.(node);
-        const context: TreeViewNodeContext = {
-          node,
-          level,
-          expanded: isExpanded,
-          selected: isSelected,
-          hasChildren,
-          toggle,
-          select,
-        };
+}: TreeViewItemsProps) {
+  const items = nodes.map((node, index) => {
+    const children = node.children ?? [];
+    const hasChildren = children.length > 0;
+    const isExpanded = hasChildren && expanded.has(node.id);
+    const isSelected = selectedId === node.id;
+    const itemId = `${idPrefix}-${index}`;
+    const labelId = `${itemId}-label`;
+    const countId = `${itemId}-count`;
+    const toggle = () => onToggle(node);
+    const select = () => onSelect?.(node);
+    const context: TreeViewNodeContext = {
+      node,
+      level,
+      expanded: isExpanded,
+      selected: isSelected,
+      hasChildren,
+      toggle,
+      select,
+    };
 
-        return (
-          <li
-            key={node.id}
-            data-tree-view-node={node.id}
-            data-state={isSelected ? "selected" : undefined}
-            {...nodeAttributes?.(node)}
-          >
-            <div className="flex items-center gap-1">
-              {hasChildren ? (
-                <button
-                  type="button"
-                  aria-label={isExpanded ? labels.collapse(node) : labels.expand(node)}
-                  data-tree-view-toggle={node.id}
-                  data-expanded={isExpanded}
-                  className="flex size-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  onClick={toggle}
-                >
-                  <ChevronRight
-                    aria-hidden="true"
-                    className={cn("size-4 transition-transform", isExpanded && "rotate-90")}
-                  />
-                </button>
-              ) : (
-                <span aria-hidden="true" className="size-5 shrink-0" />
-              )}
-              {renderNode ? (
-                renderNode(context)
-              ) : (
-                <button
-                  type="button"
-                  data-tree-view-select={node.id}
-                  className={cn(
-                    "flex min-w-0 flex-1 items-center gap-2 rounded-sm px-2 py-1 text-left text-sm hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    isSelected && "bg-accent font-medium text-accent-foreground",
-                  )}
-                  onClick={select}
-                >
-                  {node.icon ?? null}
-                  <span className="truncate">{node.label}</span>
-                  {node.count === undefined ? null : (
-                    <span
-                      data-tree-view-count={node.id}
-                      className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums"
-                    >
-                      {node.count}
-                    </span>
-                  )}
-                </button>
-              )}
-            </div>
-            {hasChildren && isExpanded ? (
-              <TreeViewBranch
-                nodes={children}
-                level={level + 1}
-                selectedId={selectedId}
-                expanded={expanded}
-                onToggle={onToggle}
-                onSelect={onSelect}
-                renderNode={renderNode}
-                nodeAttributes={nodeAttributes}
-                labels={labels}
+    // The treeitem is named explicitly so the nested role="group" never leaks
+    // into name-from-content. A custom renderNode owns its own markup, so the
+    // node label is the fallback name there.
+    const labelledBy = node.count === undefined ? labelId : `${labelId} ${countId}`;
+
+    return (
+      <li
+        key={node.id}
+        ref={(element) => {
+          registerItem(node.id, element);
+        }}
+        role="treeitem"
+        tabIndex={activeId === node.id ? 0 : -1}
+        aria-level={level}
+        aria-selected={isSelected}
+        aria-expanded={hasChildren ? isExpanded : undefined}
+        aria-label={renderNode ? node.label : undefined}
+        aria-labelledby={renderNode ? undefined : labelledBy}
+        data-tree-view-node={node.id}
+        data-state={isSelected ? "selected" : undefined}
+        className="rounded-sm outline-none"
+        onKeyDown={(event) => onItemKeyDown(event, node)}
+        onFocus={(event) => onItemFocus(event, node)}
+        {...nodeAttributes?.(node)}
+      >
+        <div
+          data-tree-view-select={renderNode ? undefined : node.id}
+          className={cn(
+            "flex items-center gap-1 rounded-sm [li:focus-visible>&]:ring-2 [li:focus-visible>&]:ring-ring",
+            isSelected && "bg-accent text-accent-foreground",
+          )}
+          onPointerDown={() => onItemPointerDown(node)}
+          onClick={renderNode ? undefined : select}
+        >
+          {hasChildren ? (
+            <span
+              aria-hidden="true"
+              title={isExpanded ? labels.collapse(node) : labels.expand(node)}
+              data-tree-view-toggle={node.id}
+              data-expanded={isExpanded}
+              className="flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              onClick={(event) => {
+                event.stopPropagation();
+                toggle();
+              }}
+            >
+              <ChevronRight
+                className={cn("size-4 transition-transform", isExpanded && "rotate-90")}
               />
-            ) : null}
-          </li>
-        );
-      })}
-    </ul>
-  );
+            </span>
+          ) : (
+            <span aria-hidden="true" className="size-5 shrink-0" />
+          )}
+          {renderNode ? (
+            renderNode(context)
+          ) : (
+            <span
+              className={cn(
+                "flex min-w-0 flex-1 cursor-pointer items-center gap-2 px-2 py-1 text-left text-sm hover:bg-accent hover:text-accent-foreground",
+                isSelected && "font-medium",
+              )}
+            >
+              {node.icon ?? null}
+              <span id={labelId} className="truncate">
+                {node.label}
+              </span>
+              {node.count === undefined ? null : (
+                <span
+                  id={countId}
+                  data-tree-view-count={node.id}
+                  className="ml-auto shrink-0 text-xs text-muted-foreground tabular-nums"
+                >
+                  {node.count}
+                </span>
+              )}
+            </span>
+          )}
+        </div>
+        {hasChildren && isExpanded ? (
+          <ul role="group" className="ml-3 flex flex-col gap-0.5 border-l pl-2">
+            <TreeViewItems
+              nodes={children}
+              level={level + 1}
+              idPrefix={itemId}
+              selectedId={selectedId}
+              activeId={activeId}
+              expanded={expanded}
+              onToggle={onToggle}
+              onSelect={onSelect}
+              onItemKeyDown={onItemKeyDown}
+              onItemFocus={onItemFocus}
+              onItemPointerDown={onItemPointerDown}
+              registerItem={registerItem}
+              renderNode={renderNode}
+              nodeAttributes={nodeAttributes}
+              labels={labels}
+            />
+          </ul>
+        ) : null}
+      </li>
+    );
+  });
+
+  return <>{items}</>;
 }
 
 export function TreeView({
@@ -173,25 +252,158 @@ export function TreeView({
   labels,
   empty,
   className,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
 }: TreeViewProps) {
   const t = { ...DEFAULT_LABELS, ...labels };
+  const baseId = React.useId();
   const [internalExpandedIds, setInternalExpandedIds] = React.useState<string[]>(
     () => defaultExpandedIds ?? [],
   );
+  const [focusedId, setFocusedId] = React.useState<string | null>(null);
   const currentExpandedIds = expandedIds ?? internalExpandedIds;
   const expanded = React.useMemo(
     () => new Set(currentExpandedIds),
     [currentExpandedIds],
   );
+  const visibleNodes = React.useMemo(
+    () => flattenVisibleNodes(nodes, expanded, 1, null, []),
+    [nodes, expanded],
+  );
+
+  const itemsRef = React.useRef(new Map<string, HTMLLIElement>());
+  const registerItem = (id: string, element: HTMLLIElement | null) => {
+    if (element === null) {
+      itemsRef.current.delete(id);
+    } else {
+      itemsRef.current.set(id, element);
+    }
+  };
+
+  // Roving tabindex: exactly one treeitem is tabbable — the last focused node
+  // while it stays visible, else the selected node, else the first node.
+  const isVisible = (id: string | null | undefined) =>
+    id !== null && id !== undefined && visibleNodes.some((entry) => entry.node.id === id);
+  let activeId: string | null = visibleNodes[0]?.node.id ?? null;
+  if (isVisible(focusedId)) {
+    activeId = focusedId;
+  } else if (isVisible(selectedId)) {
+    activeId = selectedId ?? null;
+  }
+
+  const focusItem = (id: string) => {
+    setFocusedId(id);
+    itemsRef.current.get(id)?.focus();
+  };
+
+  const focusAt = (index: number) => {
+    const entry = visibleNodes[index];
+    if (entry !== undefined) {
+      focusItem(entry.node.id);
+    }
+  };
+
+  const setExpansion = (node: TreeViewNode, next: boolean) => {
+    if (expanded.has(node.id) === next) {
+      return;
+    }
+    const nextIds = next
+      ? [...currentExpandedIds, node.id]
+      : currentExpandedIds.filter((id) => id !== node.id);
+    if (expandedIds === undefined) {
+      setInternalExpandedIds(nextIds);
+    }
+    onExpandedChange?.(nextIds);
+  };
 
   const handleToggle = (node: TreeViewNode) => {
-    const next = expanded.has(node.id)
-      ? currentExpandedIds.filter((id) => id !== node.id)
-      : [...currentExpandedIds, node.id];
-    if (expandedIds === undefined) {
-      setInternalExpandedIds(next);
+    setExpansion(node, !expanded.has(node.id));
+  };
+
+  // ArrowRight opens a closed branch, then steps into it; a leaf is a no-op.
+  const expandOrEnter = (entry: TreeViewFlatNode, index: number) => {
+    if (!entry.hasChildren) {
+      return false;
     }
-    onExpandedChange?.(next);
+    if (entry.expanded) {
+      focusAt(index + 1);
+    } else {
+      setExpansion(entry.node, true);
+    }
+    return true;
+  };
+
+  // ArrowLeft closes an open branch, else steps out to the parent.
+  const collapseOrLeave = (entry: TreeViewFlatNode) => {
+    if (entry.hasChildren && entry.expanded) {
+      setExpansion(entry.node, false);
+      return true;
+    }
+    if (entry.parentId === null) {
+      return false;
+    }
+    focusItem(entry.parentId);
+    return true;
+  };
+
+  const applyKey = (key: string, entry: TreeViewFlatNode, index: number) => {
+    switch (key) {
+      case "ArrowDown":
+        focusAt(index + 1);
+        return true;
+      case "ArrowUp":
+        focusAt(index - 1);
+        return true;
+      case "Home":
+        focusAt(0);
+        return true;
+      case "End":
+        focusAt(visibleNodes.length - 1);
+        return true;
+      case "ArrowRight":
+        return expandOrEnter(entry, index);
+      case "ArrowLeft":
+        return collapseOrLeave(entry);
+      case "Enter":
+      case " ":
+        onSelect?.(entry.node);
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const handleItemKeyDown = (
+    event: React.KeyboardEvent<HTMLLIElement>,
+    node: TreeViewNode,
+  ) => {
+    // Only the treeitem that actually holds focus reacts; the event bubbles
+    // through every ancestor treeitem on its way out.
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    const index = visibleNodes.findIndex((entry) => entry.node.id === node.id);
+    if (index === -1) {
+      return;
+    }
+    if (applyKey(event.key, visibleNodes[index], index)) {
+      event.preventDefault();
+    }
+  };
+
+  const handleItemFocus = (
+    event: React.FocusEvent<HTMLLIElement>,
+    node: TreeViewNode,
+  ) => {
+    if (event.target === event.currentTarget) {
+      setFocusedId(node.id);
+    }
+  };
+
+  // A pointer press moves the roving tabindex with it, so a later Tab leaves
+  // the tree from the node the user last touched.
+  const handleItemPointerDown = (node: TreeViewNode) => {
+    focusItem(node.id);
   };
 
   return (
@@ -199,17 +411,30 @@ export function TreeView({
       {nodes.length === 0 ? (
         (empty ?? <p className="px-2 py-1 text-sm text-muted-foreground">{t.empty}</p>)
       ) : (
-        <TreeViewBranch
-          nodes={nodes}
-          level={1}
-          selectedId={selectedId}
-          expanded={expanded}
-          onToggle={handleToggle}
-          onSelect={onSelect}
-          renderNode={renderNode}
-          nodeAttributes={nodeAttributes}
-          labels={t}
-        />
+        <ul
+          role="tree"
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          className="flex flex-col gap-0.5"
+        >
+          <TreeViewItems
+            nodes={nodes}
+            level={1}
+            idPrefix={baseId}
+            selectedId={selectedId}
+            activeId={activeId}
+            expanded={expanded}
+            onToggle={handleToggle}
+            onSelect={onSelect}
+            onItemKeyDown={handleItemKeyDown}
+            onItemFocus={handleItemFocus}
+            onItemPointerDown={handleItemPointerDown}
+            registerItem={registerItem}
+            renderNode={renderNode}
+            nodeAttributes={nodeAttributes}
+            labels={t}
+          />
+        </ul>
       )}
     </div>
   );
