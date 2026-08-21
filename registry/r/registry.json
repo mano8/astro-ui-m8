@@ -70,6 +70,12 @@
       "description": "Canonical unauthorized state for auth-gated plugin pages."
     },
     {
+      "name": "tree-view",
+      "type": "registry:component",
+      "title": "Tree View",
+      "description": "Generic, accessible, keyboard-navigable controlled tree for nested M8 plugin data (e.g. category trees). No data fetching, no business types."
+    },
+    {
       "name": "dialog-form",
       "type": "registry:component",
       "title": "Dialog Form Recipe",
