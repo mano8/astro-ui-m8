@@ -1,6 +1,22 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitest/config";
 
+const fixture = (path: string) =>
+  fileURLToPath(new URL(`./fixtures/registry-consumer/${path}`, import.meta.url));
+
 export default defineConfig({
+  // Registry blocks are written to be copied into a consumer app, so they
+  // import `@/lib/utils` and optional peers this package never installs. The
+  // render tests under `tests/registry/**` therefore resolve those specifiers
+  // to the very shims `npm run verify:registry-consumer` compiles the copied
+  // blocks against, so both gates agree on the same consumer surface.
+  resolve: {
+    alias: {
+      "@/lib/utils": fixture("lib/utils.ts"),
+      "lucide-react": fixture("types/lucide-react.tsx")
+    }
+  },
   test: {
     environment: "node",
     globals: true,
