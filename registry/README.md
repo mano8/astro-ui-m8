@@ -16,7 +16,7 @@ runtime-import these copied UI blocks from this package.
   `data-table`, `data-table-column-header`, `data-table-pagination`,
   `data-table-view-options`, `data-table-server-toolbar`,
   `data-table-server-faceted-filter`, `toast-notification`, `state-loading`, `state-empty`,
-  `state-error`, `state-unauthorized`, `dialog-form`, `table-page`.
+  `state-error`, `state-unauthorized`, `dialog-form`, `table-page`, `tree-view`.
 
 ## Required Packages
 
@@ -186,6 +186,41 @@ Default status resolution is:
 - `loading` when `loading === true`
 - `empty` when there is no data
 - otherwise `ready`
+
+### `tree-view`
+
+Copies `tree-view.tsx`. A domain-agnostic, controlled tree: no data fetching,
+no business types, and no `registryDependencies` — it composes only `cn`
+(`@/lib/utils`) and a `lucide-react` chevron.
+
+`TreeView` props:
+
+- `nodes: TreeViewNode[]` — `{ id, label, children?, count?, icon? }`
+- `selectedId?`, `onSelect?(node)` — controlled selection
+- `expandedIds?`, `onExpandedChange?(expandedIds)` — controlled expansion;
+  omit both and expansion is internal, seeded from `defaultExpandedIds`
+- `renderNode?(context)` — escape hatch for custom row markup; `context`
+  carries `node`, `level`, `expanded`, `selected`, `hasChildren`, `toggle`,
+  `select`
+- `nodeAttributes?(node)` — spread onto each node's `<li>`, mirroring the
+  data-table's `rowAttributes` convention
+- `labels?` — overridable `empty`/`expand`/`collapse` copy
+- `empty?` — overridable empty-state slot
+- `aria-label` / `aria-labelledby` — required to name the tree for
+  assistive tech (no default; the consumer supplies one)
+
+Behavior and accessibility:
+
+- `role="tree"` on the root, `role="group"` on nested lists, `role="treeitem"`
+  on each node with `aria-level`, `aria-selected`, and `aria-expanded`
+  (parents only)
+- roving tabindex: the last-focused visible node, else the selected node,
+  else the first node, is the sole tabbable treeitem
+- keyboard: ArrowUp/ArrowDown move across visible nodes, Home/End jump to the
+  ends, ArrowRight opens a closed branch then steps into it, ArrowLeft closes
+  an open branch then steps out to its parent, Enter/Space select
+- `data-tree-view-node`, `data-tree-view-toggle`, `data-tree-view-select`,
+  and `data-tree-view-count` test hooks are attached per node
 
 ## Extend-Not-Fork Rule
 

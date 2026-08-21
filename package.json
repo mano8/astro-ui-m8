@@ -147,7 +147,8 @@
       "state-error",
       "state-unauthorized",
       "dialog-form",
-      "table-page"
+      "table-page",
+      "tree-view"
     ],
     "consumerImports": {
       "ui": "@/components/ui/*",
