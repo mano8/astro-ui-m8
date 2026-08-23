@@ -41,8 +41,20 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Fleet alignment gates
+        run: npm run verify:fleet-gates
+
+      - name: Registry drift
+        run: npm run verify:registry-drift
+
+      - name: Typecheck the installed registry skins
+        run: npm run verify:registry-consumer
+
       - name: Verify npm package contents
         run: npm pack --dry-run
+
+      - name: Standalone install-from-tarball smoke
+        run: npm run verify:tarball-install
 
   test:
     runs-on: ubuntu-latest
@@ -105,5 +117,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run production dependency audit (HIGH/CRITICAL advisories)
-        run: npm audit --omit=dev --audit-level=high
+      - name: Run npm audit (HIGH/CRITICAL advisories, dev dependencies included)
+        run: npm audit --audit-level=high
