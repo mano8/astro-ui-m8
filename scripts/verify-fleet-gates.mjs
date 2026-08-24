@@ -144,6 +144,17 @@ function gateTokenBridgeOnly() {
         }
       });
   }
+  // A colour belongs in the bridge wherever it is written, so the literal check
+  // follows it into the blocks and recipes as well as the stylesheets.
+  for (const file of sourceFiles) {
+    stripComments(read(file))
+      .split("\n")
+      .forEach((line, index) => {
+        if (COLOUR_LITERAL.test(line)) {
+          fail("token-bridge-only", `${file}:${index + 1}`, `colour literal outside ${TOKEN_BRIDGE}`);
+        }
+      });
+  }
 }
 
 function gateNoInlineStyle() {
