@@ -15,7 +15,9 @@ It owns:
   `table-page` recipes;
 - the design-token bridge (`src/lib/tokens.css`);
 - generic **list-params** helpers (`src/lib/list-params.ts`);
-- the shared **test harness** (`@mano8/astro-ui-m8/testing`).
+- the typed **kit label-map contract** for i18n (`src/lib/labels.ts`);
+- the shared **test harness** (`@mano8/astro-ui-m8/testing`), including an
+  `axe`-based accessibility baseline.
 
 ## Delivery model — registry-copy first
 

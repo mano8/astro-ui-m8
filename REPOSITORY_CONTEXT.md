@@ -14,7 +14,10 @@ list-parameters helper, and shared test harness.
 - `registry/blocks/state/**` owns loading, empty, error, and unauthorized states.
 - `registry/recipes/{dialog-form,table-page}/**` owns shared recipes.
 - `src/lib/list-params.ts` remains generic, `src/lib/tokens.css` is the default token
-  bridge, and `src/testing/**` is published as `@mano8/astro-ui-m8/testing`.
+  bridge, `src/lib/labels.ts` is the canonical typed label-map contract
+  (`KitLabels`/`DEFAULT_KIT_LABELS`/`mergeKitLabels`) for i18n across the kit,
+  and `src/testing/**` is published as `@mano8/astro-ui-m8/testing`, including
+  the shared `axe`-based a11y baseline (`expectNoA11yViolations`).
 
 ## Repository rules
 

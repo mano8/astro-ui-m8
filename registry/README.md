@@ -291,6 +291,65 @@ Behavior and accessibility:
 - `data-tree-view-node`, `data-tree-view-toggle`, `data-tree-view-select`,
   and `data-tree-view-count` test hooks are attached per node
 
+## Accessibility and i18n baseline (`A-C5`)
+
+Every block that renders developer-facing copy already accepts its own local
+labels with English defaults — `data-table-pagination` and `tree-view` group
+them under a typed `*Labels` interface, `state-*` and `error-boundary` take
+individual string props. That leaves no single place to declare a
+translation: adopting a second locale means finding every block instance
+across every island and wiring its props by hand.
+
+`@mano8/astro-ui-m8` (the package root, not a registry item — see
+[Versioning](#versioning) for why registry items stay copy-only) exports a
+typed contract for exactly that:
+
+- `KitLabels` — one interface with a section per block
+  (`stateEmpty`, `stateError`, `stateLoading`, `stateUnauthorized`,
+  `errorBoundary`, `commandPalette`, `treeView`, `dataTablePagination`).
+- `DEFAULT_KIT_LABELS` — the exact English defaults each block ships today,
+  kept honest by render tests that assert each block's actual default text
+  against this constant.
+- `mergeKitLabels(overrides)` — merges a host's overrides over the defaults,
+  one section at a time, so overriding `stateError.retryLabel` never drops
+  `stateError.title`.
+
+Resolve labels once, then pass the matching section to each block's own
+`labels`/string props — no registry item imports this module, so a copied
+block stays self-contained:
+
+```ts
+import { mergeKitLabels } from "@mano8/astro-ui-m8";
+
+const labels = mergeKitLabels({
+  stateError: { retryLabel: "Réessayer" },
+});
+
+<StateError {...labels.stateError} onRetry={retry} />
+<DataTablePagination table={table} labels={labels.dataTablePagination} />
+```
+
+`@mano8/astro-ui-m8/testing` exports the kit's `axe`-based a11y baseline
+alongside the request/query-client helpers:
+
+- `expectNoA11yViolations(container, options?)` — runs `jest-axe`'s `axe` and
+  throws with the offending rule id, its impact, and the affected node's HTML
+  when a violation is found, rather than a bare boolean assertion. `jest-axe`
+  is imported lazily on first call, not at module load, so a consumer that
+  never calls this stays free of the dependency.
+
+`expectNoA11yViolations` does not need `jest-axe`'s own matcher
+(`toHaveNoViolations`), which targets Jest's `expect`, not Vitest's — but a
+consumer that wants the matcher directly registers it once, the same way this
+package's own suite does in `fixtures/vitest.setup.ts`:
+
+```ts
+import { expect } from "vitest";
+import { toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
+```
+
 ## Extend-Not-Fork Rule
 
 Do not create one-off copies of the data table or shared state blocks inside

@@ -15,6 +15,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
+import { expectNoA11yViolations } from "../../src/testing/index.js";
 import {
   CommandPalette,
   useCommandPaletteShortcut,
@@ -105,6 +106,14 @@ describe("command-palette registry block", () => {
 
     expect(screen.getByText("Prompt command palette")).toBeTruthy();
     expect(screen.getByText("Jump to any prompt action.")).toBeTruthy();
+  });
+
+  it("has no axe violations while open with groups (`A-C5`)", async () => {
+    const { container } = render(
+      <CommandPalette open groups={makeGroups(() => undefined)} onOpenChange={() => undefined} />,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
 

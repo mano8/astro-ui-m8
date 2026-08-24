@@ -12,6 +12,7 @@ import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
+import { expectNoA11yViolations } from "../../src/testing/index.js";
 import { ErrorBoundary } from "../../registry/blocks/feedback/error-boundary";
 
 afterEach(cleanup);
@@ -251,6 +252,16 @@ describe("error-boundary registry block", () => {
     render(<Harness />);
     fireEvent.click(screen.getByText("re-render"));
     expect(screen.getByText("This view stopped responding")).toBeTruthy();
+  });
+
+  it("has no axe violations on the default fallback (`A-C5`)", async () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <Boom throws />
+      </ErrorBoundary>,
+    );
+
+    await expectNoA11yViolations(container);
   });
 
   it("accepts overridden fallback copy", () => {

@@ -27,6 +27,9 @@ export default defineConfig({
       // plugin already installs via `data-table`'s faceted filter / dialog-form.
       { find: "@/components/ui/command", replacement: fixture("components/ui/command.tsx") },
       { find: "@/components/ui/dialog", replacement: fixture("components/ui/dialog.tsx") },
+      // `state-loading` renders the shared skeleton primitive (`A-C5`'s new
+      // `state-*` render suite is the first thing here to exercise it).
+      { find: "@/components/ui/skeleton", replacement: fixture("components/ui/skeleton.tsx") },
       { find: "lucide-react", replacement: fixture("types/lucide-react.tsx") },
       // Copied-sibling specifiers (`./state-error`, `./data-table`, ...), shared
       // with the `/_preview` gallery so both toolchains resolve a block the same
@@ -37,6 +40,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
+    setupFiles: ["./fixtures/vitest.setup.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json-summary", "lcov"],

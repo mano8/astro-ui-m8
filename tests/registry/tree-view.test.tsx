@@ -13,6 +13,7 @@ import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
+import { expectNoA11yViolations } from "../../src/testing/index.js";
 import { TreeView, type TreeViewNode } from "../../registry/blocks/tree/tree-view";
 
 afterEach(cleanup);
@@ -145,6 +146,14 @@ describe("tree-view nested rendering", () => {
 
     rerender(<TreeView nodes={[]} empty={<p>Create one to get started.</p>} />);
     expect(screen.getByText("Create one to get started.")).toBeTruthy();
+  });
+
+  it("has no axe violations expanded, with a labelled tree (`A-C5`)", async () => {
+    const { container } = render(
+      <TreeView nodes={NODES} defaultExpandedIds={ALL_EXPANDED} selectedId="a-1" aria-label="Categories" />,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
 

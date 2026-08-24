@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider, type QueryClientConfig } from "@tanstack/react-query";
 import { render, type RenderOptions, type RenderResult } from "@testing-library/react";
 import { createElement, type ReactElement, type ReactNode } from "react";
+import type { JestAxe } from "jest-axe";
 
 export interface TestRequestInput {
   path: string;
@@ -117,4 +118,44 @@ export function createTestRequestMock(): TestRequestMock {
 
 export function createUnauthorizedError(message?: string): UnauthorizedTestError {
   return new UnauthorizedTestError(message);
+}
+
+/**
+ * The kit's a11y baseline (`A-C5`). Every consuming repository — the four
+ * business plugins and this package's own registry render tests — runs the
+ * same `axe-core` ruleset through this one entry point, rather than each
+ * pinning its own `jest-axe`/`axe-core` version and rule config.
+ *
+ * `jest-axe` is imported lazily, on first call, rather than at module load.
+ * `renderWithQueryClient` and friends already give every consumer of this
+ * harness an unavoidable `@testing-library/react` + `@tanstack/react-query`
+ * requirement; a static top-level `import "jest-axe"` here would add a third
+ * one for every caller of *any* helper in this file, including the many that
+ * never touch accessibility. A lazy import keeps that cost scoped to callers
+ * of this function.
+ *
+ * Accepts `RenderResult["container"]` directly so a call site reads as one
+ * line after `render(...)`, matching `renderWithQueryClient`'s ergonomics.
+ * Reports the offending rule id, its impact and the affected node's HTML on
+ * failure — detail a bare boolean assertion would throw away.
+ */
+export async function expectNoA11yViolations(
+  container: Element,
+  options?: Parameters<JestAxe>[1]
+): Promise<void> {
+  const { axe } = await import("jest-axe");
+  const results = await axe(container, options);
+
+  if (results.violations.length === 0) {
+    return;
+  }
+
+  const report = results.violations
+    .map((violation) => {
+      const nodes = violation.nodes.map((node) => node.html).join("\n    ");
+      return `- ${violation.id} (${violation.impact ?? "unknown"}): ${violation.help}\n    ${nodes}`;
+    })
+    .join("\n");
+
+  throw new Error(`axe found ${results.violations.length} accessibility violation(s):\n${report}`);
 }
