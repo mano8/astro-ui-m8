@@ -50,6 +50,13 @@ jobs:
       - name: Typecheck the installed registry skins
         run: npm run verify:registry-consumer
 
+      # The dev-only gallery renders every block from source, so it is the one
+      # gate that fails when a block's imports stop resolving. It was broken for
+      # every `table-page` sibling until `A-C2`, unnoticed because nothing ran
+      # it.
+      - name: Build the /_preview gallery
+        run: npm run preview:build
+
       - name: Verify npm package contents
         run: npm pack --dry-run
 

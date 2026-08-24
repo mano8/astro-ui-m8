@@ -13,6 +13,7 @@ import {
   TablePage,
   type TablePageStatus,
 } from "../../../registry/recipes/table-page/table-page";
+import { ErrorBoundary } from "../../../registry/blocks/feedback/error-boundary";
 import { StateEmpty } from "../../../registry/blocks/state/state-empty";
 import { StateError } from "../../../registry/blocks/state/state-error";
 import { StateLoading } from "../../../registry/blocks/state/state-loading";
@@ -101,6 +102,16 @@ function sliceRows(
   };
 }
 
+/** Throws on demand so the boundary panel has something real to catch. */
+function BoundaryProbe({ failing }: { failing: boolean }) {
+  if (failing) throw new Error("The preview probe threw during render.");
+  return (
+    <p className="preview-copy">
+      The probe is rendering normally. Break it to see the boundary catch.
+    </p>
+  );
+}
+
 export function PreviewApp() {
   const [rows, setRows] = React.useState<PreviewRow[]>(INITIAL_ROWS);
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -110,6 +121,7 @@ export function PreviewApp() {
   const [query, setQuery] = React.useState("");
   const [filter, setFilter] = React.useState("");
   const [tablePageStatus, setTablePageStatus] = React.useState<TablePageStatus>("ready");
+  const [probeFailing, setProbeFailing] = React.useState(false);
   const [message, setMessage] = React.useState("Use the fixture to inspect the canonical registry blocks.");
 
   const form = useZodDialogForm({
@@ -274,6 +286,30 @@ export function PreviewApp() {
             }
           />
         </div>
+      </section>
+
+      <section className="preview-card">
+        <div className="preview-card__header preview-card__header--split">
+          <div>
+            <h2>Error boundary</h2>
+            <p>
+              A render throw inside an island blanks the whole island. The
+              boundary degrades it to the canonical error state instead.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setProbeFailing((current) => !current)}
+          >
+            {probeFailing ? "Repair the probe" : "Break the probe"}
+          </Button>
+        </div>
+        <ErrorBoundary
+          resetKeys={[probeFailing]}
+          onError={(error) => setMessage(`Boundary caught: ${error.message}`)}
+        >
+          <BoundaryProbe failing={probeFailing} />
+        </ErrorBoundary>
       </section>
 
       <DialogForm
