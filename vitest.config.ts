@@ -23,6 +23,10 @@ export default defineConfig({
       // stub of it.
       { find: "@/components/ui/alert", replacement: fixture("components/ui/alert.tsx") },
       { find: "@/components/ui/button", replacement: fixture("components/ui/button.tsx") },
+      // `command-palette` renders through the same two shadcn primitives every
+      // plugin already installs via `data-table`'s faceted filter / dialog-form.
+      { find: "@/components/ui/command", replacement: fixture("components/ui/command.tsx") },
+      { find: "@/components/ui/dialog", replacement: fixture("components/ui/dialog.tsx") },
       { find: "lucide-react", replacement: fixture("types/lucide-react.tsx") },
       // Copied-sibling specifiers (`./state-error`, `./data-table`, ...), shared
       // with the `/_preview` gallery so both toolchains resolve a block the same

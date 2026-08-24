@@ -188,6 +188,20 @@
       ]
     },
     {
+      "name": "command-palette",
+      "type": "registry:component",
+      "title": "Command Palette",
+      "description": "Canonical shared ⌘K/Ctrl+K command-palette overlay: a Dialog-wrapped, grouped Command list plus the fleet-wide keyboard-shortcut hook.",
+      "registryDependencies": ["command", "dialog"],
+      "files": [
+        {
+          "path": "registry/blocks/command/command-palette.tsx",
+          "type": "registry:component",
+          "target": "components/m8-ui/command-palette.tsx"
+        }
+      ]
+    },
+    {
       "name": "state-loading",
       "type": "registry:component",
       "title": "State Loading",

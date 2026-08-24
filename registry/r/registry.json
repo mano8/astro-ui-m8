@@ -52,6 +52,12 @@
       "description": "Canonical React error boundary for M8 island roots: catches a render throw, reports it through onError, and renders the shared state-error block with a reset action."
     },
     {
+      "name": "command-palette",
+      "type": "registry:component",
+      "title": "Command Palette",
+      "description": "Canonical shared ⌘K/Ctrl+K command-palette overlay: a Dialog-wrapped, grouped Command list plus the fleet-wide keyboard-shortcut hook."
+    },
+    {
       "name": "state-loading",
       "type": "registry:component",
       "title": "State Loading",

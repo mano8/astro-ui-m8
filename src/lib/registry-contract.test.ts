@@ -54,6 +54,31 @@ describe("shared registry contract", () => {
     expect(boundary).toContain("StateError");
   });
 
+  it("ships the command-palette item over the shared command and dialog primitives", () => {
+    const registry = JSON.parse(
+      readFileSync(resolve("registry.json"), "utf8"),
+    ) as { items: { name: string; registryDependencies?: string[] }[] };
+    const palette = readFileSync(
+      resolve("registry/blocks/command/command-palette.tsx"),
+      "utf8",
+    );
+
+    const item = registry.items.find((entry) => entry.name === "command-palette");
+    expect(item).toBeDefined();
+    expect(item?.registryDependencies).toContain("command");
+    expect(item?.registryDependencies).toContain("dialog");
+
+    // Composes the shared shadcn `command`/`dialog` primitives rather than
+    // importing `cmdk` directly, so a host never carries two copies of the
+    // same filtering/keyboard-nav logic.
+    expect(palette).toContain('from "@/components/ui/command"');
+    expect(palette).toContain('from "@/components/ui/dialog"');
+    expect(palette).not.toContain('from "cmdk"');
+    expect(palette).toContain("useCommandPaletteShortcut");
+    expect(palette).toContain("metaKey");
+    expect(palette).toContain("ctrlKey");
+  });
+
   it("freezes every shipped item name", () => {
     const registry = JSON.parse(
       readFileSync(resolve("registry.json"), "utf8"),

@@ -16,7 +16,7 @@ runtime-import these copied UI blocks from this package.
   `data-table`, `data-table-column-header`, `data-table-pagination`,
   `data-table-view-options`, `data-table-server-toolbar`,
   `data-table-server-faceted-filter`, `toast-notification`, `error-boundary`,
-  `state-loading`, `state-empty`,
+  `command-palette`, `state-loading`, `state-empty`,
   `state-error`, `state-unauthorized`, `dialog-form`, `table-page`, `tree-view`.
 
 ## Required Packages
@@ -158,6 +158,47 @@ your own `fallback`.
 <ErrorBoundary resetKeys={[processId]} onError={(error) => report(error)}>
   <LibraryView />
 </ErrorBoundary>
+```
+
+### `command-palette`
+
+A shared `⌘K`/`Ctrl+K` overlay: a `Dialog`-wrapped, grouped `Command` list, plus
+a keyboard-shortcut hook exported on its own so a host can wire the toggle from
+wherever makes sense (a header button, a route). Composes the same
+`@/components/ui/command` and `@/components/ui/dialog` primitives `table-page`
+and `dialog-form` already require, rather than importing `cmdk` directly —
+`cmdk` stays a single, host-owned copy.
+
+`CommandPalette` props:
+
+- `groups` — `{ heading, items }[]`; each item is
+  `{ id, label, description?, shortcut?, keywords?, onSelect }`
+- `open`, `onOpenChange` — controlled; the block never manages its own open
+  state
+- `placeholder?`, `emptyLabel?` — copy for the input and the no-match state
+- `title?`, `description?` — dialog title/description, rendered `sr-only`; the
+  visible affordance is the input itself, same as shadcn's own `CommandDialog`
+  recipe
+
+`useCommandPaletteShortcut(onToggle, { disabled? })` attaches a document-level
+`keydown` listener for `⌘K`/`Ctrl+K` (case-insensitive, cleaned up on unmount)
+and calls `onToggle` — it does not touch `open` itself, so it composes with any
+state a host already has.
+
+```tsx
+const [open, setOpen] = useState(false);
+useCommandPaletteShortcut(() => setOpen((value) => !value));
+
+<CommandPalette
+  open={open}
+  onOpenChange={setOpen}
+  groups={[
+    {
+      heading: "Blocks",
+      items: [{ id: "new-block", label: "New block", onSelect: createBlock }],
+    },
+  ]}
+/>;
 ```
 
 ### `state-unauthorized`
