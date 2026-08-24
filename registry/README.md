@@ -15,7 +15,8 @@ runtime-import these copied UI blocks from this package.
 - Treat generated item names as frozen during adoption:
   `data-table`, `data-table-column-header`, `data-table-pagination`,
   `data-table-view-options`, `data-table-server-toolbar`,
-  `data-table-server-faceted-filter`, `toast-notification`, `state-loading`, `state-empty`,
+  `data-table-server-faceted-filter`, `toast-notification`, `error-boundary`,
+  `state-loading`, `state-empty`,
   `state-error`, `state-unauthorized`, `dialog-form`, `table-page`, `tree-view`.
 
 ## Required Packages
@@ -131,6 +132,33 @@ speaks `page`/`pageSize`.
 - `retryLabel?`
 - `onRetry?`
 - `action?`
+
+### `error-boundary`
+
+Copies `error-boundary.tsx` alongside `state-error.tsx`, which it renders as its
+default fallback. Wrap each island root: a render throw otherwise unmounts the
+whole island and leaves the host page with a blank region.
+
+`ErrorBoundary` props:
+
+- `children`
+- `fallback?` — `({ error, reset }) => ReactNode`, replacing the default surface
+- `onError?` — `(error, { componentStack })`; the block never logs on its own
+- `resetKeys?` — clears the boundary when any member changes (`Object.is`, by
+  position), so navigating away from the input that threw recovers without a
+  reload
+- `title?`, `description?`, `retryLabel?` — copy for the default fallback
+
+The default fallback renders `data-m8-error-boundary="fallback"` as a test hook
+and deliberately **does not** render the caught message: a render throw carries
+whatever the failing code put in it. Read the detail from `onError`, or pass
+your own `fallback`.
+
+```tsx
+<ErrorBoundary resetKeys={[processId]} onError={(error) => report(error)}>
+  <LibraryView />
+</ErrorBoundary>
+```
 
 ### `state-unauthorized`
 

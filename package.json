@@ -188,6 +188,7 @@
       "data-table-server-toolbar",
       "data-table-server-faceted-filter",
       "toast-notification",
+      "error-boundary",
       "state-loading",
       "state-empty",
       "state-error",

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { DataTableColumnHeader } from "./components/m8-ui/data-table-column-header";
 import { DataTableServer } from "./components/m8-ui/data-table";
 import { DialogForm, useZodDialogForm } from "./components/m8-ui/dialog-form";
+import { ErrorBoundary } from "./components/m8-ui/error-boundary";
 import { StateEmpty } from "./components/m8-ui/state-empty";
 import { StateError } from "./components/m8-ui/state-error";
 import { StateLoading } from "./components/m8-ui/state-loading";
@@ -47,6 +48,18 @@ export function RegistryConsumerFixture() {
   });
 
   return (
+    <ErrorBoundary
+      resetKeys={[page, pageSize]}
+      onError={(error, info) => {
+        void error;
+        void info;
+      }}
+      fallback={({ error, reset }) => (
+        <button type="button" onClick={reset}>
+          {error.message}
+        </button>
+      )}
+    >
     <main>
       <DataTableServer
         columns={columns}
@@ -92,5 +105,6 @@ export function RegistryConsumerFixture() {
       <StateError />
       <StateUnauthorized />
     </main>
+    </ErrorBoundary>
   );
 }

@@ -28,6 +28,47 @@ describe("shared registry contract", () => {
     expect(toast).toContain("ToastNotificationHost");
   });
 
+  it("ships the error-boundary item over the canonical state-error fallback", () => {
+    const registry = JSON.parse(
+      readFileSync(resolve("registry.json"), "utf8"),
+    ) as { items: { name: string; files: { path: string }[] }[] };
+    const boundary = readFileSync(
+      resolve("registry/blocks/feedback/error-boundary.tsx"),
+      "utf8",
+    );
+
+    const item = registry.items.find((entry) => entry.name === "error-boundary");
+    expect(item).toBeDefined();
+    // The block renders `state-error`, so the item has to carry that file too —
+    // otherwise `shadcn add error-boundary` installs a component whose import
+    // does not resolve.
+    expect(item?.files.map((file) => file.path)).toContain(
+      "registry/blocks/state/state-error.tsx",
+    );
+
+    expect(boundary).toContain("getDerivedStateFromError");
+    expect(boundary).toContain("componentDidCatch");
+    expect(boundary).toContain("resetKeys");
+    expect(boundary).toContain("onError");
+    expect(boundary).toContain('data-m8-error-boundary="fallback"');
+    expect(boundary).toContain("StateError");
+  });
+
+  it("freezes every shipped item name", () => {
+    const registry = JSON.parse(
+      readFileSync(resolve("registry.json"), "utf8"),
+    ) as { items: { name: string }[] };
+    const pkg = JSON.parse(readFileSync(resolve("package.json"), "utf8")) as {
+      mano8RegistryContract: { frozenItemNames: string[] };
+    };
+
+    // Adding an item without freezing its name is how a consumer ends up
+    // depending on a name this package never promised to keep.
+    expect([...pkg.mano8RegistryContract.frozenItemNames].sort()).toEqual(
+      registry.items.map((item) => item.name).sort(),
+    );
+  });
+
   it("ships the tree-view item with its documented hooks and a11y contract", () => {
     const registry = JSON.parse(
       readFileSync(resolve("registry.json"), "utf8"),
