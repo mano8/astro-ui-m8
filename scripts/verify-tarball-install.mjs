@@ -24,6 +24,7 @@ const NPM_CACHE_DIR = join(ROOT, ".tmp", "npm-cache");
 // Probe both rather than assuming, so neither platform is the odd one out.
 const NPM_CLI = resolveNpmCli();
 const EXPECTED_REGISTRY_ITEMS = [
+  "command-palette.json",
   "data-table.json",
   "data-table-column-header.json",
   "data-table-pagination.json",
@@ -31,6 +32,7 @@ const EXPECTED_REGISTRY_ITEMS = [
   "data-table-server-toolbar.json",
   "data-table-view-options.json",
   "dialog-form.json",
+  "error-boundary.json",
   "state-empty.json",
   "state-error.json",
   "state-loading.json",
@@ -48,7 +50,9 @@ const EXPECTED_PACKAGE_FILES = [
   "dist/src/testing/index.js",
   "dist/src/testing/index.d.ts",
   "registry/README.md",
+  "registry/blocks/command/command-palette.tsx",
   "registry/blocks/data-table/data-table.tsx",
+  "registry/blocks/feedback/error-boundary.tsx",
   "registry/blocks/tree/tree-view.tsx",
   "registry/recipes/dialog-form/dialog-form.tsx"
 ];
