@@ -32,7 +32,8 @@ const EXPECTED_REGISTRY_ITEMS = [
   "state-error.json",
   "state-loading.json",
   "state-unauthorized.json",
-  "table-page.json"
+  "table-page.json",
+  "tree-view.json"
 ];
 const EXPECTED_PACKAGE_FILES = [
   "LICENSE",
@@ -45,6 +46,7 @@ const EXPECTED_PACKAGE_FILES = [
   "dist/src/testing/index.d.ts",
   "registry/README.md",
   "registry/blocks/data-table/data-table.tsx",
+  "registry/blocks/tree/tree-view.tsx",
   "registry/recipes/dialog-form/dialog-form.tsx"
 ];
 
