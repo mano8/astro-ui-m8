@@ -27,9 +27,13 @@
     "registry/blocks",
     "registry/recipes",
     "registry/README.md",
+    "scripts/verify-skin-version-lock.mjs",
     "README.md",
     "LICENSE"
   ],
+  "bin": {
+    "astro-ui-m8-skin-lock": "scripts/verify-skin-version-lock.mjs"
+  },
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -39,7 +43,8 @@
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
     },
-    "./src/lib/tokens.css": "./src/lib/tokens.css"
+    "./src/lib/tokens.css": "./src/lib/tokens.css",
+    "./package.json": "./package.json"
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
@@ -54,6 +59,7 @@
     "verify:fleet-gates": "node scripts/verify-fleet-gates.mjs",
     "verify:registry-consumer": "node scripts/verify-registry-consumer.mjs",
     "verify:registry-drift": "node scripts/verify-registry-drift.mjs",
+    "verify:skin-version-lock": "node scripts/verify-skin-version-lock.mjs .tmp/registry-consumer/components/m8-ui",
     "verify:tarball-install": "node scripts/verify-tarball-install.mjs"
   },
   "peerDependencies": {

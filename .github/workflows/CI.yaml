@@ -50,6 +50,15 @@ jobs:
       - name: Typecheck the installed registry skins
         run: npm run verify:registry-consumer
 
+      # A-C6: the guard is deliberately non-fatal (see its own header), so this
+      # step is a smoke check, not an assertion — it proves the script runs
+      # clean against a real installed skin set (the fixture
+      # `verify:registry-consumer` populated above), the self-reference
+      # `require.resolve("@mano8/astro-ui-m8/package.json")` depends on
+      # resolves, and every stamp `build-registry.mjs` wrote is readable.
+      - name: Skin/logic version-lock guard self-check
+        run: npm run verify:skin-version-lock
+
       # The dev-only gallery renders every block from source, so it is the one
       # gate that fails when a block's imports stop resolving. It was broken for
       # every `table-page` sibling until `A-C2`, unnoticed because nothing ran

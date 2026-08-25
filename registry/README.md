@@ -291,6 +291,29 @@ Behavior and accessibility:
 - `data-tree-view-node`, `data-tree-view-toggle`, `data-tree-view-select`,
   and `data-tree-view-count` test hooks are attached per node
 
+## Skin/logic version-lock guard (`A-C6`)
+
+A copied registry item is a consumer-side artifact (`shadcn add` writes it
+once); nothing re-copies it when the installed `@mano8/astro-ui-m8` version
+moves on afterwards, so a host can end up running a skin whose shape predates
+its own dependency for a long time without noticing. Every generated `.ts`/
+`.tsx` file — under `components/m8-ui/**` after `shadcn add` — carries a
+leading stamp recording the package version it was copied from:
+
+```text
+// astro-ui-m8-skin-version: 1.5.0 (A-C6 — run `npx astro-ui-m8-skin-lock` to compare against your installed @mano8/astro-ui-m8)
+```
+
+Run `npx astro-ui-m8-skin-lock [dir]` (default `components/m8-ui`) in a
+consumer app to compare every stamped file's version against the installed
+package and list what has drifted. It is a dev-mode prompt, not a build gate:
+it always exits `0` and never fails CI on its own — a version behind the
+installed one is not necessarily a real problem under semver, since a
+minor/patch bump changes nothing about a skin whose shape and behaviour did
+not move. Re-run `npx shadcn add <item>` for anything it flags to pick up
+whatever changed since, or check this file's changelog to see whether it
+matters for that item.
+
 ## Accessibility and i18n baseline (`A-C5`)
 
 Every block that renders developer-facing copy already accepts its own local

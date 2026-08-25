@@ -67,10 +67,15 @@ aliases are **major**-version changes.
 ## Commands
 
 - `npm run build` — `tsc` → `dist/`, then `build:registry`.
-- `npm run build:registry` — generate `registry/r/*.json` from `registry.json`.
+- `npm run build:registry` — generate `registry/r/*.json` from `registry.json`,
+  stamping every copied `.ts`/`.tsx` file with the package version it was
+  built from (`A-C6`).
 - `npm run typecheck` — `tsc --noEmit`.
 - `npm test` — Vitest with coverage.
 - `npm run test:unit` — Vitest without coverage.
+- `npx astro-ui-m8-skin-lock [dir]` — published bin (`A-C6`); run in a
+  consumer app to warn when its copied skins predate the installed
+  `@mano8/astro-ui-m8`. See [`registry/README.md`](registry/README.md#skinlogic-version-lock-guard-a-c6).
 
 > Status: stable (`1.0.0`). Registry blocks, recipes, token bridge, list-params,
 > and the test harness are in place and follow strict semver.
