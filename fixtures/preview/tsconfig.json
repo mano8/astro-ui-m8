@@ -5,7 +5,6 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "strict": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["../registry-consumer/*"],
       "lucide-react": ["./shims/lucide-react.tsx"],

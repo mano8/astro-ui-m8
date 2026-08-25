@@ -15,3 +15,16 @@ export type {
   ListParamOptions,
   NormalizedListParams
 } from "./lib/list-params.js";
+export { DEFAULT_KIT_LABELS, mergeKitLabels } from "./lib/labels.js";
+export type {
+  CommandPaletteLabels,
+  DataTablePaginationLabels,
+  ErrorBoundaryLabels,
+  KitLabelOverrides,
+  KitLabels,
+  StateEmptyLabels,
+  StateErrorLabels,
+  StateLoadingLabels,
+  StateUnauthorizedLabels,
+  TreeViewLabels
+} from "./lib/labels.js";

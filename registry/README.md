@@ -15,8 +15,9 @@ runtime-import these copied UI blocks from this package.
 - Treat generated item names as frozen during adoption:
   `data-table`, `data-table-column-header`, `data-table-pagination`,
   `data-table-view-options`, `data-table-server-toolbar`,
-  `data-table-server-faceted-filter`, `toast-notification`, `state-loading`, `state-empty`,
-  `state-error`, `state-unauthorized`, `dialog-form`, `table-page`.
+  `data-table-server-faceted-filter`, `toast-notification`, `error-boundary`,
+  `command-palette`, `state-loading`, `state-empty`,
+  `state-error`, `state-unauthorized`, `dialog-form`, `table-page`, `tree-view`.
 
 ## Required Packages
 
@@ -132,6 +133,74 @@ speaks `page`/`pageSize`.
 - `onRetry?`
 - `action?`
 
+### `error-boundary`
+
+Copies `error-boundary.tsx` alongside `state-error.tsx`, which it renders as its
+default fallback. Wrap each island root: a render throw otherwise unmounts the
+whole island and leaves the host page with a blank region.
+
+`ErrorBoundary` props:
+
+- `children`
+- `fallback?` — `({ error, reset }) => ReactNode`, replacing the default surface
+- `onError?` — `(error, { componentStack })`; the block never logs on its own
+- `resetKeys?` — clears the boundary when any member changes (`Object.is`, by
+  position), so navigating away from the input that threw recovers without a
+  reload
+- `title?`, `description?`, `retryLabel?` — copy for the default fallback
+
+The default fallback renders `data-m8-error-boundary="fallback"` as a test hook
+and deliberately **does not** render the caught message: a render throw carries
+whatever the failing code put in it. Read the detail from `onError`, or pass
+your own `fallback`.
+
+```tsx
+<ErrorBoundary resetKeys={[processId]} onError={(error) => report(error)}>
+  <LibraryView />
+</ErrorBoundary>
+```
+
+### `command-palette`
+
+A shared `⌘K`/`Ctrl+K` overlay: a `Dialog`-wrapped, grouped `Command` list, plus
+a keyboard-shortcut hook exported on its own so a host can wire the toggle from
+wherever makes sense (a header button, a route). Composes the same
+`@/components/ui/command` and `@/components/ui/dialog` primitives `table-page`
+and `dialog-form` already require, rather than importing `cmdk` directly —
+`cmdk` stays a single, host-owned copy.
+
+`CommandPalette` props:
+
+- `groups` — `{ heading, items }[]`; each item is
+  `{ id, label, description?, shortcut?, keywords?, onSelect }`
+- `open`, `onOpenChange` — controlled; the block never manages its own open
+  state
+- `placeholder?`, `emptyLabel?` — copy for the input and the no-match state
+- `title?`, `description?` — dialog title/description, rendered `sr-only`; the
+  visible affordance is the input itself, same as shadcn's own `CommandDialog`
+  recipe
+
+`useCommandPaletteShortcut(onToggle, { disabled? })` attaches a document-level
+`keydown` listener for `⌘K`/`Ctrl+K` (case-insensitive, cleaned up on unmount)
+and calls `onToggle` — it does not touch `open` itself, so it composes with any
+state a host already has.
+
+```tsx
+const [open, setOpen] = useState(false);
+useCommandPaletteShortcut(() => setOpen((value) => !value));
+
+<CommandPalette
+  open={open}
+  onOpenChange={setOpen}
+  groups={[
+    {
+      heading: "Blocks",
+      items: [{ id: "new-block", label: "New block", onSelect: createBlock }],
+    },
+  ]}
+/>;
+```
+
 ### `state-unauthorized`
 
 `StateUnauthorized` props:
@@ -186,6 +255,123 @@ Default status resolution is:
 - `loading` when `loading === true`
 - `empty` when there is no data
 - otherwise `ready`
+
+### `tree-view`
+
+Copies `tree-view.tsx`. A domain-agnostic, controlled tree: no data fetching,
+no business types, and no `registryDependencies` — it composes only `cn`
+(`@/lib/utils`) and a `lucide-react` chevron.
+
+`TreeView` props:
+
+- `nodes: TreeViewNode[]` — `{ id, label, children?, count?, icon? }`
+- `selectedId?`, `onSelect?(node)` — controlled selection
+- `expandedIds?`, `onExpandedChange?(expandedIds)` — controlled expansion;
+  omit both and expansion is internal, seeded from `defaultExpandedIds`
+- `renderNode?(context)` — escape hatch for custom row markup; `context`
+  carries `node`, `level`, `expanded`, `selected`, `hasChildren`, `toggle`,
+  `select`
+- `nodeAttributes?(node)` — spread onto each node's `<li>`, mirroring the
+  data-table's `rowAttributes` convention
+- `labels?` — overridable `empty`/`expand`/`collapse` copy
+- `empty?` — overridable empty-state slot
+- `aria-label` / `aria-labelledby` — required to name the tree for
+  assistive tech (no default; the consumer supplies one)
+
+Behavior and accessibility:
+
+- `role="tree"` on the root, `role="group"` on nested lists, `role="treeitem"`
+  on each node with `aria-level`, `aria-selected`, and `aria-expanded`
+  (parents only)
+- roving tabindex: the last-focused visible node, else the selected node,
+  else the first node, is the sole tabbable treeitem
+- keyboard: ArrowUp/ArrowDown move across visible nodes, Home/End jump to the
+  ends, ArrowRight opens a closed branch then steps into it, ArrowLeft closes
+  an open branch then steps out to its parent, Enter/Space select
+- `data-tree-view-node`, `data-tree-view-toggle`, `data-tree-view-select`,
+  and `data-tree-view-count` test hooks are attached per node
+
+## Skin/logic version-lock guard (`A-C6`)
+
+A copied registry item is a consumer-side artifact (`shadcn add` writes it
+once); nothing re-copies it when the installed `@mano8/astro-ui-m8` version
+moves on afterwards, so a host can end up running a skin whose shape predates
+its own dependency for a long time without noticing. Every generated `.ts`/
+`.tsx` file — under `components/m8-ui/**` after `shadcn add` — carries a
+leading stamp recording the package version it was copied from:
+
+```text
+// astro-ui-m8-skin-version: 1.5.0 (A-C6 — run `npx astro-ui-m8-skin-lock` to compare against your installed @mano8/astro-ui-m8)
+```
+
+Run `npx astro-ui-m8-skin-lock [dir]` (default `components/m8-ui`) in a
+consumer app to compare every stamped file's version against the installed
+package and list what has drifted. It is a dev-mode prompt, not a build gate:
+it always exits `0` and never fails CI on its own — a version behind the
+installed one is not necessarily a real problem under semver, since a
+minor/patch bump changes nothing about a skin whose shape and behaviour did
+not move. Re-run `npx shadcn add <item>` for anything it flags to pick up
+whatever changed since, or check this file's changelog to see whether it
+matters for that item.
+
+## Accessibility and i18n baseline (`A-C5`)
+
+Every block that renders developer-facing copy already accepts its own local
+labels with English defaults — `data-table-pagination` and `tree-view` group
+them under a typed `*Labels` interface, `state-*` and `error-boundary` take
+individual string props. That leaves no single place to declare a
+translation: adopting a second locale means finding every block instance
+across every island and wiring its props by hand.
+
+`@mano8/astro-ui-m8` (the package root, not a registry item — see
+[Versioning](#versioning) for why registry items stay copy-only) exports a
+typed contract for exactly that:
+
+- `KitLabels` — one interface with a section per block
+  (`stateEmpty`, `stateError`, `stateLoading`, `stateUnauthorized`,
+  `errorBoundary`, `commandPalette`, `treeView`, `dataTablePagination`).
+- `DEFAULT_KIT_LABELS` — the exact English defaults each block ships today,
+  kept honest by render tests that assert each block's actual default text
+  against this constant.
+- `mergeKitLabels(overrides)` — merges a host's overrides over the defaults,
+  one section at a time, so overriding `stateError.retryLabel` never drops
+  `stateError.title`.
+
+Resolve labels once, then pass the matching section to each block's own
+`labels`/string props — no registry item imports this module, so a copied
+block stays self-contained:
+
+```ts
+import { mergeKitLabels } from "@mano8/astro-ui-m8";
+
+const labels = mergeKitLabels({
+  stateError: { retryLabel: "Réessayer" },
+});
+
+<StateError {...labels.stateError} onRetry={retry} />
+<DataTablePagination table={table} labels={labels.dataTablePagination} />
+```
+
+`@mano8/astro-ui-m8/testing` exports the kit's `axe`-based a11y baseline
+alongside the request/query-client helpers:
+
+- `expectNoA11yViolations(container, options?)` — runs `jest-axe`'s `axe` and
+  throws with the offending rule id, its impact, and the affected node's HTML
+  when a violation is found, rather than a bare boolean assertion. `jest-axe`
+  is imported lazily on first call, not at module load, so a consumer that
+  never calls this stays free of the dependency.
+
+`expectNoA11yViolations` does not need `jest-axe`'s own matcher
+(`toHaveNoViolations`), which targets Jest's `expect`, not Vitest's — but a
+consumer that wants the matcher directly registers it once, the same way this
+package's own suite does in `fixtures/vitest.setup.ts`:
+
+```ts
+import { expect } from "vitest";
+import { toHaveNoViolations } from "jest-axe";
+
+expect.extend(toHaveNoViolations);
+```
 
 ## Extend-Not-Fork Rule
 

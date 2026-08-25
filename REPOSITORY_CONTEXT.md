@@ -14,7 +14,15 @@ list-parameters helper, and shared test harness.
 - `registry/blocks/state/**` owns loading, empty, error, and unauthorized states.
 - `registry/recipes/{dialog-form,table-page}/**` owns shared recipes.
 - `src/lib/list-params.ts` remains generic, `src/lib/tokens.css` is the default token
-  bridge, and `src/testing/**` is published as `@mano8/astro-ui-m8/testing`.
+  bridge, `src/lib/labels.ts` is the canonical typed label-map contract
+  (`KitLabels`/`DEFAULT_KIT_LABELS`/`mergeKitLabels`) for i18n across the kit,
+  and `src/testing/**` is published as `@mano8/astro-ui-m8/testing`, including
+  the shared `axe`-based a11y baseline (`expectNoA11yViolations`).
+- `scripts/build-registry.mjs` stamps every generated `.ts`/`.tsx` item file
+  with the package version it was built from (`A-C6`); `scripts/verify-skin-version-lock.mjs`
+  is published as the `astro-ui-m8-skin-lock` bin, letting a consumer compare
+  their copied skins' stamps against the installed package. Non-fatal by
+  design — a dev-mode prompt, not a build gate.
 
 ## Repository rules
 

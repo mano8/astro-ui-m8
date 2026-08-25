@@ -2,9 +2,11 @@ import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { z } from "zod";
 
+import { CommandPalette, useCommandPaletteShortcut } from "./components/m8-ui/command-palette";
 import { DataTableColumnHeader } from "./components/m8-ui/data-table-column-header";
 import { DataTableServer } from "./components/m8-ui/data-table";
 import { DialogForm, useZodDialogForm } from "./components/m8-ui/dialog-form";
+import { ErrorBoundary } from "./components/m8-ui/error-boundary";
 import { StateEmpty } from "./components/m8-ui/state-empty";
 import { StateError } from "./components/m8-ui/state-error";
 import { StateLoading } from "./components/m8-ui/state-loading";
@@ -41,12 +43,27 @@ const formSchema = z.object({
 export function RegistryConsumerFixture() {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
+  const [paletteOpen, setPaletteOpen] = React.useState(false);
   const form = useZodDialogForm({
     schema: formSchema,
     defaultValues: { name: "" },
   });
 
+  useCommandPaletteShortcut(() => setPaletteOpen((open) => !open));
+
   return (
+    <ErrorBoundary
+      resetKeys={[page, pageSize]}
+      onError={(error, info) => {
+        void error;
+        void info;
+      }}
+      fallback={({ error, reset }) => (
+        <button type="button" onClick={reset}>
+          {error.message}
+        </button>
+      )}
+    >
     <main>
       <DataTableServer
         columns={columns}
@@ -91,6 +108,22 @@ export function RegistryConsumerFixture() {
       <StateEmpty />
       <StateError />
       <StateUnauthorized />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        groups={[
+          {
+            heading: "Rows",
+            items: rows.map((row) => ({
+              id: row.id,
+              label: row.name,
+              description: row.status,
+              onSelect: () => setPage(1),
+            })),
+          },
+        ]}
+      />
     </main>
+    </ErrorBoundary>
   );
 }

@@ -41,8 +41,36 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Fleet alignment gates
+        run: npm run verify:fleet-gates
+
+      - name: Registry drift
+        run: npm run verify:registry-drift
+
+      - name: Typecheck the installed registry skins
+        run: npm run verify:registry-consumer
+
+      # A-C6: the guard is deliberately non-fatal (see its own header), so this
+      # step is a smoke check, not an assertion — it proves the script runs
+      # clean against a real installed skin set (the fixture
+      # `verify:registry-consumer` populated above), the self-reference
+      # `require.resolve("@mano8/astro-ui-m8/package.json")` depends on
+      # resolves, and every stamp `build-registry.mjs` wrote is readable.
+      - name: Skin/logic version-lock guard self-check
+        run: npm run verify:skin-version-lock
+
+      # The dev-only gallery renders every block from source, so it is the one
+      # gate that fails when a block's imports stop resolving. It was broken for
+      # every `table-page` sibling until `A-C2`, unnoticed because nothing ran
+      # it.
+      - name: Build the /_preview gallery
+        run: npm run preview:build
+
       - name: Verify npm package contents
         run: npm pack --dry-run
+
+      - name: Standalone install-from-tarball smoke
+        run: npm run verify:tarball-install
 
   test:
     runs-on: ubuntu-latest
@@ -105,5 +133,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run production dependency audit (HIGH/CRITICAL advisories)
-        run: npm audit --omit=dev --audit-level=high
+      - name: Run npm audit (HIGH/CRITICAL advisories, dev dependencies included)
+        run: npm audit --audit-level=high

@@ -16,8 +16,34 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const REGISTRY_PATH = join(ROOT, "registry.json");
 const OUTPUT_DIR = join(ROOT, "registry", "r");
+const PACKAGE_JSON = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
 
 const ITEM_SCHEMA = "https://ui.shadcn.com/schema/registry-item.json";
+
+/**
+ * A version-lock stamp (`A-C6`), prepended to every copied `.ts`/`.tsx` file's
+ * content — never to the checked-in source itself, so there is nothing to keep
+ * in sync by hand. It records the `@mano8/astro-ui-m8` version the copy was
+ * generated from; `scripts/verify-skin-version-lock.mjs` reads it back out of
+ * a consumer's copied files and warns when it no longer matches the installed
+ * package. Regex-parseable on purpose: `/astro-ui-m8-skin-version:\s*(\S+)/`.
+ */
+function skinVersionStamp() {
+  return `// astro-ui-m8-skin-version: ${PACKAGE_JSON.version} (A-C6 — run \`npx astro-ui-m8-skin-lock\` to compare against your installed @mano8/astro-ui-m8)\n`;
+}
+
+/**
+ * Insert the stamp as the first line, unless the file opens with a `"use
+ * client";` directive — a leading comment is legal there too (comments never
+ * break a directive prologue), but keeping the directive as the literal first
+ * line is the safer bet against a consumer's own tooling.
+ */
+function insertSkinVersionStamp(content) {
+  const directive = /^"use client";\n/;
+  const match = content.match(directive);
+  if (!match) return skinVersionStamp() + content;
+  return match[0] + skinVersionStamp() + content.slice(match[0].length);
+}
 
 /** Build a single registry item, inlining the content of each declared file. */
 function buildItem(item) {
@@ -29,7 +55,10 @@ function buildItem(item) {
     // published registry JSON. shadcn ships file content inline; `add`
     // rewrites aliases on insertion, so beyond line endings we keep the
     // source verbatim (including the `@/` + package imports).
-    const content = raw.replace(/\r\n/g, "\n");
+    const normalized = raw.replace(/\r\n/g, "\n");
+    const content = /\.(tsx|ts)$/.test(file.path)
+      ? insertSkinVersionStamp(normalized)
+      : normalized;
     const out = { path: file.path, content, type: file.type };
     if (file.target !== undefined) out.target = file.target;
     return out;

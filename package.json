@@ -1,6 +1,6 @@
 {
   "name": "@mano8/astro-ui-m8",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Canonical shared shadcn UI registry, design-token bridge, generic list-params, and test harness for the M8 astro-*-m8 plugin fleet.",
   "type": "module",
   "license": "MIT",
@@ -27,9 +27,13 @@
     "registry/blocks",
     "registry/recipes",
     "registry/README.md",
+    "scripts/verify-skin-version-lock.mjs",
     "README.md",
     "LICENSE"
   ],
+  "bin": {
+    "astro-ui-m8-skin-lock": "scripts/verify-skin-version-lock.mjs"
+  },
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
@@ -39,7 +43,8 @@
       "types": "./dist/src/testing/index.d.ts",
       "default": "./dist/src/testing/index.js"
     },
-    "./src/lib/tokens.css": "./src/lib/tokens.css"
+    "./src/lib/tokens.css": "./src/lib/tokens.css",
+    "./package.json": "./package.json"
   },
   "types": "./dist/src/index.d.ts",
   "scripts": {
@@ -51,23 +56,14 @@
     "test": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:unit": "vitest run",
+    "verify:fleet-gates": "node scripts/verify-fleet-gates.mjs",
     "verify:registry-consumer": "node scripts/verify-registry-consumer.mjs",
+    "verify:registry-drift": "node scripts/verify-registry-drift.mjs",
+    "verify:skin-version-lock": "node scripts/verify-skin-version-lock.mjs .tmp/registry-consumer/components/m8-ui",
     "verify:tarball-install": "node scripts/verify-tarball-install.mjs"
   },
   "peerDependencies": {
     "@hookform/resolvers": "^3.0.0 || ^4.0.0 || ^5.0.0",
-    "@tanstack/react-query": "^5.101.1",
-    "@tanstack/react-table": "^8.20.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.0",
-    "cmdk": "^1.0.0",
-    "lucide-react": "1.28.0",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0",
-    "react-hook-form": "^7.50.0",
-    "sonner": "^2.0.0",
-    "tailwind-merge": "^2.0.0 || ^3.0.0",
-    "zod": "^4.0.0",
     "@radix-ui/react-alert-dialog": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.0",
@@ -76,48 +72,110 @@
     "@radix-ui/react-popover": "^1.1.0",
     "@radix-ui/react-select": "^2.1.0",
     "@radix-ui/react-separator": "^1.1.0",
-    "@radix-ui/react-slot": "^1.1.0"
+    "@radix-ui/react-slot": "^1.1.0",
+    "@tanstack/react-query": "^5.101.1",
+    "@tanstack/react-table": "^8.20.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "cmdk": "^1.0.0",
+    "jest-axe": "^11.0.0",
+    "lucide-react": "1.28.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-hook-form": "^7.50.0",
+    "sonner": "^2.0.0",
+    "tailwind-merge": "^2.0.0 || ^3.0.0",
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
-    "@hookform/resolvers": { "optional": true },
-    "@tanstack/react-query": { "optional": true },
-    "@tanstack/react-table": { "optional": true },
-    "class-variance-authority": { "optional": true },
-    "clsx": { "optional": true },
-    "cmdk": { "optional": true },
-    "lucide-react": { "optional": true },
-    "react": { "optional": true },
-    "react-dom": { "optional": true },
-    "react-hook-form": { "optional": true },
-    "sonner": { "optional": true },
-    "tailwind-merge": { "optional": true },
-    "zod": { "optional": true },
-    "@radix-ui/react-alert-dialog": { "optional": true },
-    "@radix-ui/react-checkbox": { "optional": true },
-    "@radix-ui/react-dialog": { "optional": true },
-    "@radix-ui/react-dropdown-menu": { "optional": true },
-    "@radix-ui/react-label": { "optional": true },
-    "@radix-ui/react-popover": { "optional": true },
-    "@radix-ui/react-select": { "optional": true },
-    "@radix-ui/react-separator": { "optional": true },
-    "@radix-ui/react-slot": { "optional": true }
+    "@hookform/resolvers": {
+      "optional": true
+    },
+    "jest-axe": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "@tanstack/react-table": {
+      "optional": true
+    },
+    "class-variance-authority": {
+      "optional": true
+    },
+    "clsx": {
+      "optional": true
+    },
+    "cmdk": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-hook-form": {
+      "optional": true
+    },
+    "sonner": {
+      "optional": true
+    },
+    "tailwind-merge": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    },
+    "@radix-ui/react-alert-dialog": {
+      "optional": true
+    },
+    "@radix-ui/react-checkbox": {
+      "optional": true
+    },
+    "@radix-ui/react-dialog": {
+      "optional": true
+    },
+    "@radix-ui/react-dropdown-menu": {
+      "optional": true
+    },
+    "@radix-ui/react-label": {
+      "optional": true
+    },
+    "@radix-ui/react-popover": {
+      "optional": true
+    },
+    "@radix-ui/react-select": {
+      "optional": true
+    },
+    "@radix-ui/react-separator": {
+      "optional": true
+    },
+    "@radix-ui/react-slot": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
     "@eslint-react/eslint-plugin": "^5.18.0",
-    "@typescript-eslint/eslint-plugin": "^8.65.0",
-    "@typescript-eslint/parser": "^8.65.0",
+    "@eslint/js": "^9.39.5",
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-table": "^8.20.0",
     "@testing-library/dom": "^10.0.0",
     "@testing-library/react": "^16.1.0",
+    "@types/jest-axe": "^3.5.9",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
     "@vitest/coverage-v8": "^4.1.9",
     "eslint": "^10.8.0",
     "eslint-plugin-security": "^4.0.1",
     "globals": "^16.0.0",
+    "jest-axe": "^11.0.0",
     "jsdom": "^29.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -142,12 +200,15 @@
       "data-table-server-toolbar",
       "data-table-server-faceted-filter",
       "toast-notification",
+      "error-boundary",
+      "command-palette",
       "state-loading",
       "state-empty",
       "state-error",
       "state-unauthorized",
       "dialog-form",
-      "table-page"
+      "table-page",
+      "tree-view"
     ],
     "consumerImports": {
       "ui": "@/components/ui/*",

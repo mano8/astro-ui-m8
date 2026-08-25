@@ -8,7 +8,7 @@ import {
 } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -17,7 +17,14 @@ const TMP_DIR = join(ROOT, ".tmp", "tarball-install");
 const PACK_DIR = join(TMP_DIR, "pack");
 const WORK_DIR = join(TMP_DIR, "workspace");
 const NPM_CACHE_DIR = join(ROOT, ".tmp", "npm-cache");
+// Spawned through node rather than an `npm`/`npm.cmd` shim so the script runs
+// the same way on Windows and on CI Linux, with no shell interpolation.
+// The two platforms disagree on where npm sits relative to the node binary:
+// Windows keeps it beside the executable, POSIX puts it under a sibling `lib`.
+// Probe both rather than assuming, so neither platform is the odd one out.
+const NPM_CLI = resolveNpmCli();
 const EXPECTED_REGISTRY_ITEMS = [
+  "command-palette.json",
   "data-table.json",
   "data-table-column-header.json",
   "data-table-pagination.json",
@@ -25,11 +32,13 @@ const EXPECTED_REGISTRY_ITEMS = [
   "data-table-server-toolbar.json",
   "data-table-view-options.json",
   "dialog-form.json",
+  "error-boundary.json",
   "state-empty.json",
   "state-error.json",
   "state-loading.json",
   "state-unauthorized.json",
-  "table-page.json"
+  "table-page.json",
+  "tree-view.json"
 ];
 const EXPECTED_PACKAGE_FILES = [
   "LICENSE",
@@ -41,9 +50,30 @@ const EXPECTED_PACKAGE_FILES = [
   "dist/src/testing/index.js",
   "dist/src/testing/index.d.ts",
   "registry/README.md",
+  "registry/blocks/command/command-palette.tsx",
   "registry/blocks/data-table/data-table.tsx",
+  "registry/blocks/feedback/error-boundary.tsx",
+  "registry/blocks/tree/tree-view.tsx",
   "registry/recipes/dialog-form/dialog-form.tsx"
 ];
+
+function resolveNpmCli() {
+  const nodeDir = dirname(process.execPath);
+  const candidates = [
+    // Windows: node.exe and node_modules/ share a directory.
+    join(nodeDir, "node_modules", "npm", "bin", "npm-cli.js"),
+    // POSIX, including the CI runner's hosted toolcache: bin/node with the
+    // package tree one level up under lib/.
+    join(nodeDir, "..", "lib", "node_modules", "npm", "bin", "npm-cli.js")
+  ];
+
+  const found = candidates.find((candidate) => existsSync(candidate));
+  if (found === undefined) {
+    throw new Error(`npm cli not found next to ${process.execPath}; tried:\n${candidates.join("\n")}`);
+  }
+
+  return found;
+}
 
 function assertExists(path, label) {
   if (!existsSync(path)) {
@@ -52,10 +82,7 @@ function assertExists(path, label) {
 }
 
 function runCommand(command, args, cwd) {
-  const isWindowsCmd = command.toLowerCase().endsWith(".cmd");
-  const executable = isWindowsCmd ? (process.env.ComSpec ?? "cmd.exe") : command;
-  const executableArgs = isWindowsCmd ? ["/d", "/s", "/c", command, ...args] : args;
-  const result = spawnSync(executable, executableArgs, {
+  const result = spawnSync(command, args, {
     cwd,
     encoding: "utf8",
     stdio: "pipe",
@@ -83,9 +110,13 @@ function runCommand(command, args, cwd) {
   return result;
 }
 
+function npm(args, cwd) {
+  return runCommand(process.execPath, [NPM_CLI, ...args], cwd);
+}
+
 function packTarball() {
   mkdirSync(PACK_DIR, { recursive: true });
-  runCommand("npm.cmd", ["pack", "--pack-destination", PACK_DIR], ROOT);
+  npm(["pack", "--pack-destination", PACK_DIR], ROOT);
 
   const tarballs = readdirSync(PACK_DIR).filter((entry) => entry.endsWith(".tgz"));
   if (tarballs.length !== 1) {
@@ -97,7 +128,11 @@ function packTarball() {
 
 function installTarball(tarballPath) {
   cpSync(FIXTURE_DIR, WORK_DIR, { recursive: true });
-  runCommand("npm.cmd", ["install", "--ignore-scripts", "--no-package-lock", tarballPath], WORK_DIR);
+  // `--legacy-peer-deps` keeps the smoke to the packaged graph. Every peer this
+  // package declares is optional and consumer-supplied, and npm's resolver
+  // otherwise walks the optional `@hookform/resolvers` chain into a zod
+  // conflict that says nothing about what was published.
+  npm(["install", "--ignore-scripts", "--no-package-lock", "--legacy-peer-deps", tarballPath], WORK_DIR);
 }
 
 function readInstalledPackageJson(installedRoot) {
@@ -124,11 +159,13 @@ function verifyExports(installedRoot) {
   const testingEntry = fixtureRequire.resolve("@mano8/astro-ui-m8/testing");
   const packageJson = readInstalledPackageJson(installedRoot);
 
-  if (!rootEntry.endsWith("dist\\src\\index.js")) {
+  // Compared through `sep` rather than a literal separator: the check has to
+  // mean the same thing on the Linux runner that gates the branch.
+  if (!rootEntry.endsWith(["dist", "src", "index.js"].join(sep))) {
     throw new Error(`Unexpected root export resolution: ${rootEntry}`);
   }
 
-  if (!testingEntry.endsWith("dist\\src\\testing\\index.js")) {
+  if (!testingEntry.endsWith(["dist", "src", "testing", "index.js"].join(sep))) {
     throw new Error(`Unexpected testing export resolution: ${testingEntry}`);
   }
 

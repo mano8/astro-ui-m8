@@ -169,6 +169,39 @@
       ]
     },
     {
+      "name": "error-boundary",
+      "type": "registry:component",
+      "title": "Error Boundary",
+      "description": "Canonical React error boundary for M8 island roots: catches a render throw, reports it through onError, and renders the shared state-error block with a reset action.",
+      "registryDependencies": ["alert", "button"],
+      "files": [
+        {
+          "path": "registry/blocks/feedback/error-boundary.tsx",
+          "type": "registry:component",
+          "target": "components/m8-ui/error-boundary.tsx"
+        },
+        {
+          "path": "registry/blocks/state/state-error.tsx",
+          "type": "registry:component",
+          "target": "components/m8-ui/state-error.tsx"
+        }
+      ]
+    },
+    {
+      "name": "command-palette",
+      "type": "registry:component",
+      "title": "Command Palette",
+      "description": "Canonical shared ⌘K/Ctrl+K command-palette overlay: a Dialog-wrapped, grouped Command list plus the fleet-wide keyboard-shortcut hook.",
+      "registryDependencies": ["command", "dialog"],
+      "files": [
+        {
+          "path": "registry/blocks/command/command-palette.tsx",
+          "type": "registry:component",
+          "target": "components/m8-ui/command-palette.tsx"
+        }
+      ]
+    },
+    {
       "name": "state-loading",
       "type": "registry:component",
       "title": "State Loading",
@@ -223,6 +256,20 @@
           "path": "registry/blocks/state/state-unauthorized.tsx",
           "type": "registry:component",
           "target": "components/m8-ui/state-unauthorized.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tree-view",
+      "type": "registry:component",
+      "title": "Tree View",
+      "description": "Generic, accessible, keyboard-navigable controlled tree for nested M8 plugin data (e.g. category trees). No data fetching, no business types.",
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/blocks/tree/tree-view.tsx",
+          "type": "registry:component",
+          "target": "components/m8-ui/tree-view.tsx"
         }
       ]
     },
