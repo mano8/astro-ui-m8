@@ -19,7 +19,10 @@ const WORK_DIR = join(TMP_DIR, "workspace");
 const NPM_CACHE_DIR = join(ROOT, ".tmp", "npm-cache");
 // Spawned through node rather than an `npm`/`npm.cmd` shim so the script runs
 // the same way on Windows and on CI Linux, with no shell interpolation.
-const NPM_CLI = join(dirname(process.execPath), "node_modules", "npm", "bin", "npm-cli.js");
+// The two platforms disagree on where npm sits relative to the node binary:
+// Windows keeps it beside the executable, POSIX puts it under a sibling `lib`.
+// Probe both rather than assuming, so neither platform is the odd one out.
+const NPM_CLI = resolveNpmCli();
 const EXPECTED_REGISTRY_ITEMS = [
   "data-table.json",
   "data-table-column-header.json",
@@ -49,6 +52,24 @@ const EXPECTED_PACKAGE_FILES = [
   "registry/blocks/tree/tree-view.tsx",
   "registry/recipes/dialog-form/dialog-form.tsx"
 ];
+
+function resolveNpmCli() {
+  const nodeDir = dirname(process.execPath);
+  const candidates = [
+    // Windows: node.exe and node_modules/ share a directory.
+    join(nodeDir, "node_modules", "npm", "bin", "npm-cli.js"),
+    // POSIX, including the CI runner's hosted toolcache: bin/node with the
+    // package tree one level up under lib/.
+    join(nodeDir, "..", "lib", "node_modules", "npm", "bin", "npm-cli.js")
+  ];
+
+  const found = candidates.find((candidate) => existsSync(candidate));
+  if (found === undefined) {
+    throw new Error(`npm cli not found next to ${process.execPath}; tried:\n${candidates.join("\n")}`);
+  }
+
+  return found;
+}
 
 function assertExists(path, label) {
   if (!existsSync(path)) {
@@ -157,7 +178,6 @@ function verifyTypeScriptImport() {
 
 function main() {
   assertExists(FIXTURE_DIR, "Tarball consumer fixture");
-  assertExists(NPM_CLI, "npm cli");
 
   rmSync(TMP_DIR, { recursive: true, force: true });
   mkdirSync(WORK_DIR, { recursive: true });
