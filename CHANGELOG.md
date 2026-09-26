@@ -15,6 +15,24 @@ differ from how the change would have been described on the day it shipped.
 
 ## [Unreleased]
 
+### Added
+
+- **A lock that does not pin every package fails the build**
+  (`B34-npm-lock-integrity-guard`, finding `G34`(b)).
+  `scripts/verify-lock-integrity.mjs` (`npm run verify:lock-integrity`)
+  refuses a `package-lock.json` below `lockfileVersion` 3, or one with any
+  entry that lacks `integrity` or `resolved`, carries a non-`sha512` hash,
+  resolves outside `https://registry.npmjs.org/`, or is a link or `file:`
+  source, and names every offending key. `npm ci` installs an entry with no
+  `integrity` without checking a hash and says nothing, which is how `G33`
+  went unseen. CI runs it before `npm ci` in every job that installs.
+  `tests/lock-integrity.test.ts` proves each refusal against a fixture lock
+  and asserts this repository's own lock passes. The script is
+  dependency-free and byte-identical in the fleet's six npm repositories.
+  It read red on this lock's 31 dev entries until `B33` (below) restored
+  them. Only `package.json`'s `scripts` gains an entry, so no release is
+  owed.
+
 ### Security
 
 - **npm is reached only from a published release**
@@ -27,6 +45,15 @@ differ from how the change would have been described on the day it shipped.
   plugins.
   `tests/publish-workflow.test.ts` locks each rule. The operator's `v*` tag
   policy on the `npm` environment is the platform half of the same rule.
+- **Every lock entry pins its source and bytes again**
+  (`B33-npm-lock-integrity-repair`, finding `G34`(a)). 31 dev entries of
+  `package-lock.json` (the `@babel/*` / `istanbul-*` coverage chain,
+  `typescript`, `semver` and others) had no `integrity` and no `resolved`,
+  so CI's `npm ci` installed them unverified. Each is filled from the npm
+  registry's record of its exact version: no version moves, a clean `npm ci`
+  verifies every hash, and a following `npm install` leaves the lock
+  byte-identical. The lock does not ship in the tarball, so no release is
+  owed.
 
 ## [1.5.1] - 2026-08-30
 
