@@ -45,6 +45,15 @@ differ from how the change would have been described on the day it shipped.
   plugins.
   `tests/publish-workflow.test.ts` locks each rule. The operator's `v*` tag
   policy on the `npm` environment is the platform half of the same rule.
+- **Every lock entry pins its source and bytes again**
+  (`B33-npm-lock-integrity-repair`, finding `G34`(a)). 31 dev entries of
+  `package-lock.json` (the `@babel/*` / `istanbul-*` coverage chain,
+  `typescript`, `semver` and others) had no `integrity` and no `resolved`,
+  so CI's `npm ci` installed them unverified. Each is filled from the npm
+  registry's record of its exact version: no version moves, a clean `npm ci`
+  verifies every hash, and a following `npm install` leaves the lock
+  byte-identical. The lock does not ship in the tarball, so no release is
+  owed.
 
 ## [1.5.1] - 2026-08-30
 
