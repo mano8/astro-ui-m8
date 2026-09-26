@@ -15,6 +15,19 @@ differ from how the change would have been described on the day it shipped.
 
 ## [Unreleased]
 
+### Security
+
+- **npm is reached only from a published release**
+  (`B30-pre-publish-hardening` leg 5, finding `G25`). `npm-publish.yml` ran
+  `npm publish` on any `workflow_dispatch`, from any branch, into an `npm`
+  environment with no protection. A dispatch now
+  runs `npm publish --dry-run`; a release fails unless its tag, with the `v`
+  stripped, is `package.json`'s `version`; and the tarball ships
+  `CHANGELOG.md` from the next release, as `G31`(b) asks of the business
+  plugins.
+  `tests/publish-workflow.test.ts` locks each rule. The operator's `v*` tag
+  policy on the `npm` environment is the platform half of the same rule.
+
 ## [1.5.1] - 2026-08-30
 
 ### Changed

@@ -29,6 +29,7 @@
     "registry/README.md",
     "scripts/verify-skin-version-lock.mjs",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "bin": {
