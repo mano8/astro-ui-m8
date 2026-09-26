@@ -15,6 +15,15 @@ differ from how the change would have been described on the day it shipped.
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-09-26
+
+The first tarball to ship this changelog (`B39-astro-ui-changelog-release`,
+finding `G38`): `1.5.1` went to npm without it, so the `files` fix below
+reached no consumer until a release carried it. No registry, block, recipe
+or export surface changes; `registry/r/*.json` changes only in its
+`astro-ui-m8-skin-version` stamps, which `build:registry` rewrites for every
+version.
+
 ### Added
 
 - **A lock that does not pin every package fails the build**
@@ -45,6 +54,12 @@ differ from how the change would have been described on the day it shipped.
   plugins.
   `tests/publish-workflow.test.ts` locks each rule. The operator's `v*` tag
   policy on the `npm` environment is the platform half of the same rule.
+- **The publish job verifies the lock before it installs**
+  (`B37-publish-lock-guard`, finding `G36`). `B34` guarded every `CI.yaml`
+  job but not the one that holds `id-token: write` and builds the tarball,
+  and the environment's `tag:v*` rule matches a tag by name, not by where it
+  points. `npm-publish.yml` now runs `npm run verify:lock-integrity` before
+  `npm ci`, and `tests/publish-workflow.test.ts` holds the order.
 - **Every lock entry pins its source and bytes again**
   (`B33-npm-lock-integrity-repair`, finding `G34`(a)). 31 dev entries of
   `package-lock.json` (the `@babel/*` / `istanbul-*` coverage chain,
