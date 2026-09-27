@@ -15,6 +15,52 @@ differ from how the change would have been described on the day it shipped.
 
 ## [Unreleased]
 
+## [1.5.3] - 2026-09-27
+
+A patch. It fixes a peer range that locked every consumer to one exact
+`lucide-react` release, and it adds the dependency compatibility gate that
+lets Dependabot pull requests stay unblocked without npm's own peer checks.
+There is no registry, block, recipe or export surface change.
+`registry/r/*.json` changes only in its `astro-ui-m8-skin-version` stamps,
+which `build:registry` rewrites for every version.
+
+### Fixed
+
+- **`lucide-react` peer `1.28.0` → `^1.28.0`.** The exact pin accepted no
+  other release, so `fa-ui-m8` (on `lucide-react` `^1.45.0`) could only
+  install this package with `legacy-peer-deps`, and its `.npmrc` said so.
+  All 16 icons the registry blocks import are exported by `1.28.0`,
+  `1.45.0` and `1.48.0` (the newest release on 2026-09-27).
+
+### Added
+
+- **A tree that breaks a declared range fails the build.**
+  `scripts/verify-dependency-compat.mjs` (`npm run verify:dependency-compat`)
+  reads `npm ls --all --json --long` with peer edges forced on. It names every
+  installed package outside a range declared on it, whether by a dependency,
+  an optional dependency, a dev dependency or a peer (optional peers
+  included). It also names every required dependency or peer that is not
+  installed, skipping those whose requirer is only an optional platform
+  binary. A third-party optional peer can be excused only by a written entry
+  in `dependency-compat.waivers.json`, and a stale entry fails. An edge
+  declared by an `@mano8/*` package can never be waived. CI runs the gate
+  after `npm ci`. `tests/dependency-compat.test.ts` proves each rule against
+  fixture trees shaped after the cases the fleet hit, and asserts that this
+  repository's own tree passes. The script and its test are dependency-free
+  and byte-identical across the fleet's six npm repositories.
+- **`.npmrc` with `legacy-peer-deps=true`**, byte-identical fleet-wide. npm
+  and Dependabot never refuse to resolve on a peer conflict, so an update
+  that breaks a peer range arrives as a red pull request instead of being
+  dropped. The gate above now enforces those ranges instead.
+
+### Changed
+
+- Dev dependencies aligned with `fa-ui-m8`: `react` / `react-dom` /
+  `@types/react` / `@types/react-dom` `^19.3.0`, `@typescript-eslint/*`
+  `^8.70.1`, `globals` `^17.12.0`. The lock moves exactly those packages
+  (and `scheduler`, which `react-dom` 19.3 requires), with no entry added
+  or removed.
+
 ## [1.5.2] - 2026-09-26
 
 The first tarball to ship this changelog (`B39-astro-ui-changelog-release`,
