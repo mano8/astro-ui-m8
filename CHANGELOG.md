@@ -15,6 +15,17 @@ differ from how the change would have been described on the day it shipped.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The dependency compatibility gate runs `npm ls` without a shell.**
+  Outside `npm run`, `scripts/verify-dependency-compat.mjs` spawned `npm`
+  through a shell to find `npm.cmd` on Windows, which Codacy's Semgrep
+  (`spawn-shell-true`) flags. It now runs the npm that is running it, or the
+  npm bundled beside this Node, through `process.execPath`.
+  `tests/dependency-compat.test.ts` covers that path by running the gate
+  with `npm_execpath` removed. Neither file is in the published tarball, so
+  no release is owed. Byte-identical across the fleet's npm repositories.
+
 ## [1.5.3] - 2026-09-27
 
 A patch. It fixes a peer range that locked every consumer to one exact
